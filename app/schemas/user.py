@@ -1,0 +1,41 @@
+from pydantic import BaseModel, EmailStr, ConfigDict
+from typing import Optional
+
+
+class UserBase(BaseModel):
+    first_name: str
+    last_name: str
+    phone: str
+    email: Optional[EmailStr] = None
+    role_id: int
+    user_name : str
+
+
+class UserCreate(UserBase):
+    password_hash : str
+
+
+
+class UserUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role_id: Optional[int] = None
+    is_active: Optional[bool] = None
+
+
+class UserResponse(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    phone: str
+    user_name :str
+    email: Optional[EmailStr]
+    is_active: bool
+    role_id: int
+
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )
