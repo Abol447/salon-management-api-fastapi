@@ -6,6 +6,7 @@ class LoginSchema (BaseModel) :
     password : str
 
 
+
 class LoginResponse (BaseModel):
     access_token : str
     refresh_token : str

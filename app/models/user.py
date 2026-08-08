@@ -68,3 +68,9 @@ class User(Base):
         "Token" , 
         back_populates= "user"
     )
+
+    customer = relationship(
+    "Customer",
+    back_populates="user",
+    uselist=False
+    )
