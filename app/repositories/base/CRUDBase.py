@@ -24,14 +24,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         include_deleted: bool = False,
     ) -> Optional[ModelType]:
 
-        query = db.query(self.model).filter(
-            self.model.id == obj_id
-        )
+        query = db.query(self.model).filter(self.model.id == obj_id)
 
         if hasattr(self.model, "IsDeleted") and not include_deleted:
-            query = query.filter(
-                self.model.IsDeleted == False
-            )
+            query = query.filter(self.model.IsDeleted == False)
 
         return query.first()
 
@@ -47,24 +43,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         query = db.query(self.model)
 
         if hasattr(self.model, "IsDeleted") and not include_deleted:
-            query = query.filter(
-                self.model.IsDeleted == False
-            )
+            query = query.filter(self.model.IsDeleted == False)
 
         return query.all()
 
-    # ---------------------------------
-    # CREATE
-    # ---------------------------------
     def create(
         self,
         db: Session,
         obj_in: CreateSchemaType,
     ) -> ModelType:
 
-        db_obj = self.model(
-            **obj_in.model_dump()
-        )
+        db_obj = self.model(**obj_in.model_dump())
 
         db.add(db_obj)
         db.commit()
@@ -72,9 +61,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
         return db_obj
 
-    # ---------------------------------
-    # UPDATE
-    # ---------------------------------
     def update(
         self,
         db: Session,
@@ -97,9 +83,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
         return db_obj
 
-    # ---------------------------------
-    # SOFT DELETE
-    # ---------------------------------
     def delete(
         self,
         db: Session,
@@ -132,9 +115,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
         return obj
 
-    # ---------------------------------
-    # RESTORE
-    # ---------------------------------
     def restore(
         self,
         db: Session,
@@ -176,15 +156,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         query = db.query(self.model)
 
         if hasattr(self.model, "IsDeleted") and not include_deleted:
-            query = query.filter(
-                self.model.IsDeleted == False
-            )
+            query = query.filter(self.model.IsDeleted == False)
 
         for field, value in filters.items():
             if hasattr(self.model, field):
-                query = query.filter(
-                    getattr(self.model, field) == value
-                )
+                query = query.filter(getattr(self.model, field) == value)
 
         return query.first() is not None
 
@@ -201,15 +177,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         query = db.query(self.model)
 
         if hasattr(self.model, "IsDeleted") and not include_deleted:
-            query = query.filter(
-                self.model.IsDeleted == False
-            )
+            query = query.filter(self.model.IsDeleted == False)
 
         for field, value in filters.items():
             if hasattr(self.model, field):
-                query = query.filter(
-                    getattr(self.model, field) == value
-                )
+                query = query.filter(getattr(self.model, field) == value)
 
         return query.first()
 
@@ -226,14 +198,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         query = db.query(self.model)
 
         if hasattr(self.model, "IsDeleted") and not include_deleted:
-            query = query.filter(
-                self.model.IsDeleted == False
-            )
+            query = query.filter(self.model.IsDeleted == False)
 
         for field, value in filters.items():
             if hasattr(self.model, field):
-                query = query.filter(
-                    getattr(self.model, field) == value
-                )
+                query = query.filter(getattr(self.model, field) == value)
 
         return query.all()

@@ -7,7 +7,7 @@ from app.repositories.base.CRUDBase import CRUDBase
 from app.services.customer_service import CustomerService
 
 from app.schemas.customer import CustomerResponse, CustomerUpdate, CustomerCreate
-
+from app.models.customer import Customer
 from app.db.database import get_db
 from app.dependencies.auth import get_current_user
 

@@ -8,12 +8,17 @@ class UserBase(BaseModel):
     phone: str
     email: Optional[EmailStr] = None
     role_id: int
-    user_name : str
+    user_name: str
 
 
 class UserCreate(UserBase):
-    password_hash : str
+    password_hash: str
 
+
+class SystemUserCreate(BaseModel):
+    phone: str
+    password_hash: str
+    role_id: int
 
 
 class UserUpdate(BaseModel):
@@ -30,12 +35,9 @@ class UserResponse(BaseModel):
     first_name: str
     last_name: str
     phone: str
-    user_name :str
+    user_name: str
     email: Optional[EmailStr]
     is_active: bool
     role_id: int
 
-
-    model_config = ConfigDict(
-        from_attributes=True
-    )
+    model_config = ConfigDict(from_attributes=True)

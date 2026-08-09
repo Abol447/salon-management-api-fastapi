@@ -7,6 +7,7 @@ from app.api.auth_router import router as auth_router
 from app.api.discount_router import router as discount_router
 from app.api.customer_router import router as customer_router
 from app.api.services_router import router as service_router
+from app.api.appointment_router import router as appointment_router
 
 app = FastAPI()
 
@@ -35,3 +36,4 @@ app.include_router(auth_router)
 app.include_router(customer_router)
 app.include_router(discount_router)
 app.include_router(service_router)
+app.include_router(appointment_router)

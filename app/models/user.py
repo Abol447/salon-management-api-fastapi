@@ -7,70 +7,26 @@ from app.db.base import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(
-        Integer,
-        primary_key=True,
-        index=True
-    )
+    id = Column(Integer, primary_key=True, index=True)
 
-    user_name = Column (
-        String(100), 
-        unique=True , 
-        nullable=True
-    )
+    user_name = Column(String(100), unique=True, nullable=True)
 
-    first_name = Column(
-        String(50),
-        nullable=False
-    )
+    first_name = Column(String(50), nullable=True)
 
-    last_name = Column(
-        String(50),
-        nullable=False
-    )
+    last_name = Column(String(50), nullable=True)
 
-    phone = Column(
-        String(15),
-        unique=True,
-        nullable=False,
-        index=True
-    )
+    phone = Column(String(15), unique=True, nullable=False, index=True)
 
-    email = Column(
-        String(100),
-        unique=True,
-        nullable=True
-    )
+    email = Column(String(100), unique=True, nullable=True)
 
-    password_hash = Column(
-        String(255),
-        nullable=False
-    )
+    password_hash = Column(String(255), nullable=False)
 
-    is_active = Column(
-        Boolean,
-        default=True
-    )
+    is_active = Column(Boolean, default=True)
 
-    role_id = Column(
-        Integer,
-        ForeignKey("roles.id"),
-        nullable=False
-    )
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
 
+    role = relationship("Role", back_populates="users")
 
-    role = relationship(
-        "Role",
-        back_populates="users"
-    )
+    tokens = relationship("Token", back_populates="user")
 
-    tokens = relationship(
-        "Token" , 
-        back_populates= "user"
-    )
-
-    customer = relationship(
-    "Customer",
-    back_populates="user",
-    uselist=False
-    )
+    customer = relationship("Customer", back_populates="user", uselist=False)
