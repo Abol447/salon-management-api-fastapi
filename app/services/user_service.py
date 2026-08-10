@@ -39,23 +39,23 @@ class UserService:
             user_data.password_hash = hash_password(user_data.password_hash)
 
             user_name = self.repository.filter_by(db, user_name=user_data.user_name)
-
+            print(user_data.user_name)
             if len(user_name):
                 logger.warning(
-                    f"Duplicate entry {user_data.user_name} for key 'user_name' => {e}"
+                    f"Duplicate entry {user_data.user_name} for key 'user_name' "
                 )
                 raise ForbiddenException(
                     f"Duplicate entry {user_data.user_name} for key 'user_name'"
                 )
-
-            email = self.repository.filter_by(db, email=user_data.email)
-            if len(email) > 0:
-                logger.warning(
-                    f"Duplicate entry {user_data.email} for key 'email' => {e}"
-                )
-                raise ForbiddenException(
-                    f"Duplicate entry {user_data.email} for key 'user_name'"
-                )
+            if user_data.email:
+                email = self.repository.filter_by(db, email=user_data.email )
+                if len(email) > 0:
+                    logger.warning(
+                        f"Duplicate entry {user_data.email} for key 'email'"
+                    )
+                    raise ForbiddenException(
+                        f"Duplicate entry {user_data.email} for key 'user_name'"
+                    )
 
             response = self.repository.create(db, user_data)
             if role.name.lower() == "customer":
