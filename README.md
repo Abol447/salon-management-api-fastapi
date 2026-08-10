@@ -269,8 +269,4 @@ uvicorn app.main:app --reload
 - Each developer should create their own `.env`.
 - Run database migrations before starting the project.
 
----
 
-# License
-
-Private Project
