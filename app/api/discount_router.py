@@ -10,6 +10,8 @@ from app.schemas.discount import (
     DiscountResponse,
 )
 from app.services.discount_service import DiscountService
+from app.core.messages import messages
+from app.schemas.response import ResponseSchema
 
 router = APIRouter(prefix="/discount", tags=["discount"])
 
@@ -19,46 +21,56 @@ def get_discount_service():
     return DiscountService(repo)
 
 
-@router.post("", response_model=DiscountResponse)
+@router.post("", response_model=ResponseSchema[DiscountResponse])
 def create_discount(
     discount_data: DiscountCreate,
     db: Session = Depends(get_db),
     service: DiscountService = Depends(get_discount_service),
 ):
-    return service.create(db, discount_data)
+    data = service.create(db, discount_data)
+
+    return ResponseSchema(data=data, message=messages.DISCOUNT_CREATED)
 
 
-@router.get("", response_model=list[DiscountResponse])
+@router.get("", response_model=ResponseSchema[list[DiscountResponse]])
 def get_all_discount(
     db: Session = Depends(get_db),
     service: DiscountService = Depends(get_discount_service),
 ):
-    return service.get_all(db)
+    data = service.get_all(db)
+
+    return ResponseSchema(data=data, message=messages.DISCOUNTS_FOUND)
 
 
-@router.get("/{discount_id}", response_model=DiscountResponse)
+@router.get("/{discount_id}", response_model=ResponseSchema[DiscountResponse])
 def get_discount(
     discount_id: int,
     db: Session = Depends(get_db),
     service: DiscountService = Depends(get_discount_service),
 ):
-    return service.get(db, discount_id)
+    data = service.get(db, discount_id)
+
+    return ResponseSchema(data=data, message=messages.DISCOUNT_FOUND)
 
 
-@router.put("/{discount_id}", response_model=DiscountResponse)
+@router.put("/{discount_id}", response_model=ResponseSchema[DiscountResponse])
 def update_discount(
     discount_id: int,
     discount_data: DiscountUpdate,
     db: Session = Depends(get_db),
     service: DiscountService = Depends(get_discount_service),
 ):
-    return service.update(db, discount_id, discount_data)
+    data = service.update(db, discount_id, discount_data)
+
+    return ResponseSchema(data=data, message=messages.DISCOUNT_UPDATED)
 
 
-@router.delete("/{discount_id}", response_model=DiscountResponse)
+@router.delete("/{discount_id}", response_model=ResponseSchema[DiscountResponse])
 def delete_discount(
     discount_id: int,
     db: Session = Depends(get_db),
     service: DiscountService = Depends(get_discount_service),
 ):
-    return service.delete(db, discount_id)
+    data = service.delete(db, discount_id)
+
+    return ResponseSchema(data=data, message=messages.DISCOUNT_DELETED)

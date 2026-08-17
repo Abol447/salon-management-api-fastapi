@@ -6,6 +6,8 @@ from app.repositories.base.CRUDBase import CRUDBase
 from app.schemas.role import RoleResponse, RoleCreate, RoleUpdate
 from app.services.role_service import RoleService
 from app.db.database import get_db
+from app.core.messages import messages
+from app.schemas.response import ResponseSchema
 
 router = APIRouter(prefix="/roles", tags=["roles"])
 
@@ -15,47 +17,55 @@ def get_service() -> RoleService:
     return RoleService(repo)
 
 
-@router.post("", response_model=RoleResponse, status_code=201)
+@router.post("", response_model=ResponseSchema[RoleResponse], status_code=201)
 def create_role(
     role_data: RoleCreate,
     db: Session = Depends(get_db),
     service: RoleService = Depends(get_service),
 ):
-    return service.create(db, role_data)
+    data = service.create(db, role_data)
+
+    return ResponseSchema(data=data, message=messages.ROLE_CREATED)
 
 
-@router.get("/{role_id}", response_model=RoleResponse)
+@router.get("/{role_id}", response_model=ResponseSchema[RoleResponse])
 def get_role(
     role_id: int,
     db: Session = Depends(get_db),
     service: RoleService = Depends(get_service),
 ):
-    return service.get_by_id(db, role_id)
+    data = service.get_by_id(db, role_id)
+
+    return ResponseSchema(data=data, message=messages.GET_ALL)
 
 
-@router.get("", response_model=list[RoleResponse])
+@router.get("", response_model=ResponseSchema[list[RoleResponse]])
 def get_roles(
     db: Session = Depends(get_db), service: RoleService = Depends(get_service)
 ):
-    return service.get_all(db)
+    data = service.get_all(db)
+
+    return ResponseSchema(data=data, message=messages.GET_ALL)
 
 
-@router.put("/{role_id}", response_model=RoleResponse)
+@router.put("/{role_id}", response_model=ResponseSchema[RoleResponse])
 def update_role(
     role_id: int,
     role_data: RoleUpdate,
     db: Session = Depends(get_db),
     service: RoleService = Depends(get_service),
 ):
-    return service.update(db, role_id, role_data)
+    data = service.update(db, role_id, role_data)
+
+    return ResponseSchema(data=data, message=messages.ROLE_UPDATED)
 
 
-@router.delete("/{role_id}", status_code=204)
+@router.delete("/{role_id}", response_model=ResponseSchema[RoleResponse])
 def delete_role(
     role_id: int,
     db: Session = Depends(get_db),
     service: RoleService = Depends(get_service),
 ):
-    service.delete(db, role_id)
+    data = service.delete(db, role_id)
 
-    return None
+    return ResponseSchema(data=data, message=messages.ROLE_DELETED)

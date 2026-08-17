@@ -1,7 +1,5 @@
-from sqlalchemy import Column, Integer, DateTime, Text, Boolean, ForeignKey, Numeric
+from sqlalchemy import Column, Integer, DateTime, Text, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
-from datetime import datetime
-
 from app.db.base import Base
 from app.db.mixins import TimestampMixin, SoftDeleteMixin
 
@@ -13,14 +11,22 @@ class Appointment(Base, SoftDeleteMixin, TimestampMixin):
 
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
 
-    service_id = Column(Integer, ForeignKey("services.id"), nullable=False)
-
     start_time = Column(DateTime, nullable=False)
 
     description = Column(Text, nullable=True)
 
+    salon_id = Column(Integer, ForeignKey("salons.id"), nullable=False)
+
     paid_price = Column(Numeric(10, 2), nullable=True)
+
+    wallet_transactions = relationship(
+        "WalletTransaction", back_populates="appointment"
+    )
 
     customer = relationship("Customer", back_populates="appointments")
 
-    service = relationship("Service", back_populates="appointments")
+    salon = relationship("Salon", back_populates="appointment")
+
+    appointment_services = relationship(
+        "AppointmentService", back_populates="appointment", cascade="all, delete-orphan"
+    )

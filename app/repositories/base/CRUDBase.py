@@ -48,16 +48,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return query.all()
 
     def create(
-        self,
-        db: Session,
-        obj_in: CreateSchemaType,
+        self, db: Session, obj_in: CreateSchemaType, auto_commit: bool = False
     ) -> ModelType:
 
         db_obj = self.model(**obj_in.model_dump())
 
         db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        if auto_commit:
+            db.commit()
+            db.refresh(db_obj)
+        else:
+            db.flush()
 
         return db_obj
 
@@ -66,6 +67,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db: Session,
         db_obj: ModelType,
         obj_in: UpdateSchemaType | Dict[str, Any],
+        auto_commit: bool = False,
     ) -> ModelType:
 
         update_data = (
@@ -78,8 +80,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             if hasattr(db_obj, field):
                 setattr(db_obj, field, value)
 
-        db.commit()
-        db.refresh(db_obj)
+        if auto_commit:
+            db.commit()
+            db.refresh(db_obj)
+        else:
+            db.flush()
 
         return db_obj
 

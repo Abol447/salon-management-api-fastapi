@@ -5,3 +5,8 @@ from .customer import Customer
 from .discount import Discount
 from .services import Service
 from .appointment import Appointment
+from .AppointmentService import AppointmentService
+from .owner import Owner
+from .salon import Salon
+from .wallet import Wallet
+from .wallet_transaction import WalletTransaction

@@ -1,7 +1,6 @@
-from datetime import datetime
-
-from sqlalchemy import Boolean, DateTime, Integer, Numeric, String, Text
+from sqlalchemy import Boolean, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.mixins import TimestampMixin
 from app.db.base import Base
 
@@ -26,4 +25,4 @@ class Service(Base, TimestampMixin):
         nullable=False,
     )
 
-    appointments = relationship("Appointment", back_populates="service")
+    appointment_services = relationship("AppointmentService", back_populates="service")

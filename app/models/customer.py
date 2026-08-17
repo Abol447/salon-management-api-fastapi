@@ -15,5 +15,6 @@ class Customer(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), nullable=False, unique=True, index=True
     )
+    wallet = relationship("Wallet", back_populates="customer")
     appointments = relationship("Appointment", back_populates="customer")
     user = relationship("User", back_populates="customer")

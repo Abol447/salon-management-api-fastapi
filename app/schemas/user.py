@@ -3,12 +3,12 @@ from typing import Optional
 
 
 class UserBase(BaseModel):
-    first_name: str
-    last_name: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     phone: str
     email: Optional[EmailStr] = None
     role_id: int
-    user_name: str
+    user_name: Optional[str] = None
 
 
 class UserCreate(UserBase):
@@ -32,10 +32,10 @@ class UserUpdate(BaseModel):
 
 class UserResponse(BaseModel):
     id: int
-    first_name: str
-    last_name: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     phone: str
-    user_name: str
+    user_name: Optional[str] = None
     email: Optional[EmailStr]
     is_active: bool
     role_id: int

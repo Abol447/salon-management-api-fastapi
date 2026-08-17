@@ -1,3 +1,4 @@
+from decimal import Decimal
 import secrets
 
 from sqlalchemy.orm import Session
@@ -8,22 +9,29 @@ from app.repositories.appointment_repository import (
     AppointmentUpdate,
     CRUDBase,
 )
-
+from app.core.messages import messages
 from app.core.security import hash_password
 from app.core.logger import logger
-from app.exceptions import InternalServerException
-
-from app.schemas.Appointment import AppointmentCreateInternal
+from app.exceptions import InternalServerException, NotFoundException
+from fastapi import HTTPException
+from app.schemas.Appointment import AppointmentCreateInternal, PayPrice
 from app.schemas.customer import CustomerCreate, CustomerUpdate
 from app.schemas.discount import DiscountCreate, DiscountUpdate
 from app.schemas.user import UserCreate, UserUpdate, SystemUserCreate
 from app.schemas.role import RoleCreate, RoleUpdate
-
+from app.models.owner import Owner
+from app.schemas.wallet_transaction import (
+    WalletTransactionCreate,
+    WalletTranceactionType,
+)
+from app.schemas.owner import OwnerUpdate, OwnerCreate
 from app.models.appointment import Appointment
 from app.models.customer import Customer
 from app.models.discount import Discount
+from app.services.wallet_transaction_service import WalletTransactionService
 from app.models.user import User
 from app.models.role import Role
+from app.services.wallet_service import WalletService
 
 
 class AppointmentService:
@@ -35,12 +43,18 @@ class AppointmentService:
         user_repo: CRUDBase[User, UserCreate, UserUpdate],
         role_repo: CRUDBase[Role, RoleCreate, RoleUpdate],
         customer_repo: CRUDBase[Customer, CustomerCreate, CustomerUpdate],
+        owner_repo: CRUDBase[Owner, OwnerCreate, OwnerUpdate],
+        transaction: WalletTransactionService,
+        wallet: WalletService,
     ):
         self.repo = repo
         self.discount_repo = discount_repo
         self.user_repo = user_repo
         self.role_repo = role_repo
         self.customer_repo = customer_repo
+        self.owner_repo = owner_repo
+        self.transaction = transaction
+        self.wallet = wallet
 
     def create(self, db: Session, appointment_data: AppointmentCreate):
         try:
@@ -120,11 +134,11 @@ class AppointmentService:
             appointment = self.repo.get_by_id(db, appointment_id)
 
             if appointment is None:
-                raise InternalServerException("Appointment not found")
+                raise NotFoundException("Appointment not found")
 
             return appointment
 
-        except InternalServerException:
+        except HTTPException:
             raise
 
         except Exception as e:
@@ -142,7 +156,7 @@ class AppointmentService:
             appointment = self.repo.get_by_id(db, appointment_id)
 
             if appointment is None:
-                raise InternalServerException("Appointment not found")
+                raise NotFoundException("Appointment not found")
 
             appointment = self.repo.update(
                 db, db_obj=appointment, obj_in=appointment_data
@@ -150,7 +164,7 @@ class AppointmentService:
 
             return appointment
 
-        except InternalServerException:
+        except HTTPException:
             db.rollback()
             raise
 
@@ -169,11 +183,11 @@ class AppointmentService:
             appointment = self.repo.get_by_id(db, appointment_id)
 
             if appointment is None:
-                raise InternalServerException("Appointment not found")
+                raise NotFoundException("Appointment not found")
 
-            return self.repo.delete(db, id=appointment_id)
+            return self.repo.delete(db, appointment_id)
 
-        except InternalServerException:
+        except HTTPException:
             db.rollback()
             raise
 
@@ -184,3 +198,47 @@ class AppointmentService:
             logger.exception(f"Failed to delete appointment {appointment_id}")
 
             raise InternalServerException("Failed to delete appointment")
+
+    def get_customer_appointment(self, db: Session, user_id, role: str):
+        try:
+            if role.lower() == "customer":
+                customer = self.customer_repo.first_by(db, user_id=user_id)
+                if customer is None:
+                    raise NotFoundException(messages.NOT_FOUND)
+
+                appointment = self.repo.filter_by(db, customer_id=customer.id)
+                logger.info(f"get customer appointment with id : {customer.id} ")
+            elif role.lower() == "owner":
+                owner = self.owner_repo.first_by(db, user_id=user_id)
+                appointment = self.repo.filter_by(db, salon_id=owner.salons[0].id)
+                logger.info(f"get customer appointment with id : {owner.salons[0].id} ")
+
+            return appointment
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"failed to get customer appointment with id : {customer.id} ")
+            raise InternalServerException(messages.GET_ERROR)
+
+    def pay(self, db: Session, data_in: PayPrice):
+        try:
+
+            appointment = self.update(
+                db,
+                data_in.appointment_id,
+                AppointmentUpdate(paid_price=data_in.pay_price),
+            )
+            wallet = self.wallet.get_by_customer_id(db, data_in.customer_id)
+            transaction = self.transaction.create(
+                db,
+                data_in=WalletTransactionCreate(
+                    appointment_id=data_in.appointment_id,
+                    amount=data_in.pay_price * Decimal("0.1"),
+                    type=WalletTranceactionType.CASHBACK,
+                    wallet_id=wallet.id,
+                ),
+            )
+            return appointment
+        except Exception as e:
+            print(e)
+            raise InternalServerException(messages.INTERNAL_SERVER_ERROR)
