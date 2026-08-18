@@ -16,5 +16,11 @@ class Customer(Base):
         ForeignKey("users.id"), nullable=False, unique=True, index=True
     )
     wallet = relationship("Wallet", back_populates="customer")
+
     appointments = relationship("Appointment", back_populates="customer")
+
+    discount = relationship("Discount", back_populates="customer")
+
     user = relationship("User", back_populates="customer")
+
+    discount_usages = relationship("DiscountUsage", back_populates="customer")

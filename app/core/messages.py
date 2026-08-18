@@ -89,3 +89,15 @@ class messages:
 
     APPOINTMENT_ALREADY_EXISTS = "برای این زمان قبلاً نوبت ثبت شده است"
     APPOINTMENT_TIME_UNAVAILABLE = "این زمان در دسترس نیست"
+
+    DISCOUNT_USAGE_CREATED = "استفاده از تخفیف با موفقیت ثبت شد"
+
+    DISCOUNT_USAGE_NOT_FOUND = "رکورد استفاده از تخفیف پیدا نشد"
+
+    DISCOUNT_USAGE_ALREADY_EXISTS = "این تخفیف قبلاً برای این نوبت استفاده شده است"
+
+    DISCOUNT_USAGE_CREATE_FAILED = "ثبت استفاده از تخفیف با خطا مواجه شد"
+
+    DISCOUNT_USAGE_GET_FAILED = "دریافت اطلاعات استفاده از تخفیف با خطا مواجه شد"
+
+    DISCOUNT_USAGE_DELETE_FAILED = "حذف رکورد استفاده از تخفیف با خطا مواجه شد"

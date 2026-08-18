@@ -13,6 +13,7 @@ from app.api.salon_router import router as salon_router
 from app.api.owner_router import router as owner_router
 from app.api.wallet_router import router as wallet_router
 from app.api.transaction_route import router as transaction_router
+from app.api.discount_usage_router import router as discount_usage_router
 
 app = FastAPI()
 
@@ -47,3 +48,4 @@ app.include_router(salon_router)
 app.include_router(owner_router)
 app.include_router(wallet_router)
 app.include_router(transaction_router)
+app.include_router(discount_usage_router)

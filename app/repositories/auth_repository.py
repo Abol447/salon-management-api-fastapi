@@ -20,7 +20,7 @@ class AuthRepository(CRUDBase[Token, TokenCreate, TokenUpdate]):
         query = db.query(User).filter(User.user_name == user_data.user_name).first()
 
         if query is None:
-            return ";hvfvd"
+            return None
 
         islogin = verify_password(user_data.password, query.password_hash)
         if not islogin:

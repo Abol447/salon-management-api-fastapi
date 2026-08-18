@@ -27,6 +27,10 @@ class Appointment(Base, SoftDeleteMixin, TimestampMixin):
 
     salon = relationship("Salon", back_populates="appointment")
 
+    discount_usage = relationship(
+        "DiscountUsage", back_populates="appointment", uselist=False
+    )
+
     appointment_services = relationship(
         "AppointmentService", back_populates="appointment", cascade="all, delete-orphan"
     )

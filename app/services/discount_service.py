@@ -5,11 +5,14 @@ from fastapi import HTTPException
 from app.exceptions import InternalServerException, NotFoundException
 from app.core.logger import logger
 from sqlalchemy.orm import Session
+from datetime import datetime
+from app.repositories.discount_repo import DiscountRepo
+from app.core.messages import messages
 
 
 class DiscountService:
 
-    def __init__(self, repo: CRUDBase[Discount, DiscountCreate, DiscountUpdate]):
+    def __init__(self, repo: DiscountRepo):
         self.repo = repo
 
     def create(self, db: Session, discount_data: DiscountCreate):
@@ -88,7 +91,6 @@ class DiscountService:
 
             raise InternalServerException("failed to update discount")
 
-    # DELETE
     def delete(self, db: Session, discount_id: int):
         try:
             discount = self.repo.get_by_id(db, discount_id)
@@ -111,3 +113,14 @@ class DiscountService:
             logger.error(f"failed to delete discount with id {discount_id}: {e}")
 
             raise InternalServerException("failed to delete discount")
+
+    def get_my_discount(self, db: Session, customer_id: int):
+        try:
+            discont = self.repo.get_my_discount(db, customer_id)
+            if len(discont) == 0:
+                return messages.DISCOUNT_NOT_FOUND
+
+            return discont
+        except Exception as e:
+            logger.error("failed to get discount for customer")
+            raise InternalServerException(messages.INTERNAL_SERVER_ERROR)

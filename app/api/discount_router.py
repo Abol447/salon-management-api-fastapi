@@ -7,8 +7,10 @@ from app.repositories.base.CRUDBase import CRUDBase
 from app.schemas.discount import (
     DiscountCreate,
     DiscountUpdate,
+    MyDiscount,
     DiscountResponse,
 )
+from app.repositories.discount_repo import DiscountRepo
 from app.services.discount_service import DiscountService
 from app.core.messages import messages
 from app.schemas.response import ResponseSchema
@@ -17,7 +19,7 @@ router = APIRouter(prefix="/discount", tags=["discount"])
 
 
 def get_discount_service():
-    repo = CRUDBase(Discount)
+    repo = DiscountRepo()
     return DiscountService(repo)
 
 
@@ -39,7 +41,16 @@ def get_all_discount(
 ):
     data = service.get_all(db)
 
-    return ResponseSchema(data=data, message=messages.DISCOUNTS_FOUND)
+    return ResponseSchema(data=data, message=messages.GET_ALL)
+
+
+@router.get("/me", response_model=list[MyDiscount] | str)
+def get_discount(
+    customer_id: int,
+    db: Session = Depends(get_db),
+    service: DiscountService = Depends(get_discount_service),
+):
+    return service.get_my_discount(db, customer_id)
 
 
 @router.get("/{discount_id}", response_model=ResponseSchema[DiscountResponse])
@@ -50,7 +61,7 @@ def get_discount(
 ):
     data = service.get(db, discount_id)
 
-    return ResponseSchema(data=data, message=messages.DISCOUNT_FOUND)
+    return ResponseSchema(data=data, message=messages.GET_ALL)
 
 
 @router.put("/{discount_id}", response_model=ResponseSchema[DiscountResponse])

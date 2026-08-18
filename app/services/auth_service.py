@@ -5,7 +5,12 @@ from sqlalchemy.orm import Session
 from app.schemas.auth import LoginSchema, LogOutSchema
 from app.core.logger import logger
 from fastapi import HTTPException
-from app.exceptions import InternalServerException, UnauthorizedException
+from app.exceptions import (
+    InternalServerException,
+    UnauthorizedException,
+    BadRequestException,
+)
+from app.core.messages import messages
 
 
 class AuthService:
@@ -35,11 +40,13 @@ class AuthService:
 
             if result is None:
                 logger.warning(f"login failed for username {login_data.user_name}")
-                return None
+                raise BadRequestException(messages.LOGIN_FAILED)
 
             logger.info(f"user {login_data.user_name} logged in successfully")
 
             return result
+        except HTTPException:
+            raise
 
         except Exception as e:
             logger.error(f"login error for username {login_data.user_name}: {e}")

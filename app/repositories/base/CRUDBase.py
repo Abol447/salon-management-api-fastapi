@@ -48,7 +48,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return query.all()
 
     def create(
-        self, db: Session, obj_in: CreateSchemaType, auto_commit: bool = False
+        self, db: Session, obj_in: CreateSchemaType, auto_commit: bool = True
     ) -> ModelType:
 
         db_obj = self.model(**obj_in.model_dump())
@@ -67,7 +67,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db: Session,
         db_obj: ModelType,
         obj_in: UpdateSchemaType | Dict[str, Any],
-        auto_commit: bool = False,
+        auto_commit: bool = True,
     ) -> ModelType:
 
         update_data = (
