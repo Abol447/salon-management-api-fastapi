@@ -1,5 +1,13 @@
 class messages:
 
+    SERVICE_CREATED = "سرویس با موفقیت ایجاد شد"
+    SERVICE_UPDATED = "سرویس با موفقیت ویرایش شد"
+    SERVICE_DELETED = "سرویس با موفقیت حذف شد"
+    SERVICE_NOT_FOUND = "سرویس پیدا نشد"
+    SERVICE_CREATE_FAILED = "خطا در ایجاد سرویس"
+    SERVICE_UPDATE_FAILED = "خطا در ویرایش سرویس"
+    SERVICE_DELETE_FAILED = "خطا در حذف سرویس"
+
     SUCCESS = "عملیات با موفقیت انجام شد"
     CREATED = "با موفقیت ایجاد شد"
     GET_ERROR = "دریافت موفقیت امیز نبود"
@@ -101,3 +109,14 @@ class messages:
     DISCOUNT_USAGE_GET_FAILED = "دریافت اطلاعات استفاده از تخفیف با خطا مواجه شد"
 
     DISCOUNT_USAGE_DELETE_FAILED = "حذف رکورد استفاده از تخفیف با خطا مواجه شد"
+
+    CUSTOMER_CREATED = "مشتری با موفقیت ایجاد شد"
+    CUSTOMER_UPDATED = "اطلاعات مشتری با موفقیت بروزرسانی شد"
+    CUSTOMER_DELETED = "مشتری با موفقیت حذف شد"
+    CUSTOMER_NOT_FOUND = "مشتری پیدا نشد"
+    CUSTOMER_CREATE_FAILED = "خطا در ایجاد مشتری"
+    CUSTOMER_UPDATE_FAILED = "خطا در بروزرسانی اطلاعات مشتری"
+    CUSTOMER_DELETE_FAILED = "خطا در حذف مشتری"
+    CUSTOMERS_NOT_FOUND = "هیچ مشتری‌ای پیدا نشد"
+    CUSTOMERS_RETRIEVED = "لیست مشتریان با موفقیت دریافت شد"
+    CUSTOMER_RETRIEVED = "اطلاعات مشتری با موفقیت دریافت شد"

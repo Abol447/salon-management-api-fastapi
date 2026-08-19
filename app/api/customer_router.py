@@ -37,7 +37,7 @@ def GetMyCustomer(
 ):
     data = service.get_by_user_id(db, int(user["sub"]))
 
-    return ResponseSchema(data=data, message=messages.CUSTOMER_FOUND)
+    return ResponseSchema(data=data, message=messages.GET_ALL)
 
 
 @router.get("/{customer_id}", response_model=ResponseSchema[CustomerResponse])
@@ -48,7 +48,7 @@ def GetCustomer(
 ):
     data = service.get(db, customer_id)
 
-    return ResponseSchema(data=data, message=messages.CUSTOMER_FOUND)
+    return ResponseSchema(data=data, message=messages.GET_ALL)
 
 
 @router.get("", response_model=ResponseSchema[list[CustomerResponse]])
