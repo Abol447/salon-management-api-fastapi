@@ -35,14 +35,14 @@ class AuthService:
 
     def login_service(self, db: Session, login_data: LoginSchema):
         try:
-            print(login_data.user_name)
+
             result = self.repo.login(db, login_data)
 
             if result is None:
-                logger.warning(f"login failed for username {login_data.user_name}")
+                logger.warning(f"login failed for username {login_data.phone_number}")
                 raise BadRequestException(messages.LOGIN_FAILED)
 
-            logger.info(f"user {login_data.user_name} logged in successfully")
+            logger.info(f"user {login_data.phone_number} logged in successfully")
 
             return result
         except HTTPException:

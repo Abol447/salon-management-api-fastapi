@@ -18,6 +18,9 @@ from app.schemas.customer import CustomerCreate, CustomerUpdate
 from fastapi import HTTPException
 from app.models.owner import Owner
 from app.schemas.owner import OwnerCreate, OwnerUpdate
+from app.services.wallet_service import WalletService, WalletCreate
+from app.services.discount_service import DiscountService, DiscountCreate
+from decimal import Decimal
 
 
 class UserService:
@@ -28,16 +31,26 @@ class UserService:
         role_service: CRUDBase[Role, RoleCreate, RoleUpdate],
         customer_service: CRUDBase[Customer, CustomerCreate, CustomerUpdate],
         owner_repo: CRUDBase[Owner, OwnerCreate, OwnerUpdate],
+        wallet_service: WalletService,
+        discount_service: DiscountService,
     ):
         self.repository = repository
         self.role_service = role_service
         self.customer_service = customer_service
         self.owner = owner_repo
+        self.wallet_service = wallet_service
+        self.discount_service = discount_service
 
     def create(self, db: Session, user_data: UserCreate):
 
         try:
-            role = self.role_service.get_by_id(db, user_data.role_id)
+            if user_data.role_id is None:
+                role = self.role_service.first_by(db, name="customer")
+                if role is None:
+                    raise NotFoundException(messages.ROLE_NOT_FOUND)
+                user_data.role_id = role.id
+            else:
+                role = self.role_service.get_by_id(db, user_data.role_id)
 
             user_data.password_hash = hash_password(user_data.password_hash)
 
@@ -55,13 +68,31 @@ class UserService:
                     logger.warning(f"Duplicate entry {user_data.email} for key 'email'")
                     raise ForbiddenException(messages.EMAIL_ALREADY_EXISTS)
 
-            response = self.repository.create(db, user_data)
+            response = self.repository.create(db, user_data, auto_commit=False)
             if role.name.lower() == "customer":
-                self.customer_service.create(db, CustomerCreate(user_id=response.id))
+                customer = self.customer_service.create(
+                    db, CustomerCreate(user_id=response.id), auto_commit=False
+                )
+                wallet = self.wallet_service.create(
+                    db, WalletCreate(customer_id=customer.id), auto_commit=False
+                )
+                discount = self.discount_service.create(
+                    db,
+                    DiscountCreate(
+                        customer_id=customer.id,
+                        max_usage=1,
+                        is_active=True,
+                        percent=Decimal("10"),
+                        title="welcom",
+                    ),
+                )
+                print(wallet)
             if role.name.lower() == "owner":
                 self.owner.create(db, OwnerCreate(user_id=response.id))
-            logger.info(f"user created successfully id={response.id}")
 
+            db.commit()
+            db.refresh(response)
+            logger.info(f"user created successfully id={response.id}")
             return response
 
         except HTTPException:
@@ -150,3 +181,27 @@ class UserService:
             logger.error(f"failed to delete user {user_id}: {e}")
 
             raise InternalServerException(messages.DELETE_ERROR)
+
+    def filter_users(self, db: Session, **filters):
+        try:
+            users = self.repository.filter_by(db, **filters)
+
+            logger.info(f"users filtered successfully with filters={filters}")
+
+            return users
+
+        except Exception as e:
+            logger.error(f"failed to filter users: {e}")
+            raise InternalServerException(messages.INTERNAL_SERVER_ERROR)
+
+    def first_users(self, db: Session, **filters):
+        try:
+            users = self.repository.first_by(db, **filters)
+
+            logger.info(f"users filtered successfully with filters={filters}")
+
+            return users
+
+        except Exception as e:
+            logger.error(f"failed to filter users: {e}")
+            raise InternalServerException(messages.INTERNAL_SERVER_ERROR)

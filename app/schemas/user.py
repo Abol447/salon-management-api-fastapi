@@ -7,7 +7,7 @@ class UserBase(BaseModel):
     last_name: Optional[str] = None
     phone: str
     email: Optional[EmailStr] = None
-    role_id: int
+    role_id: int | None = None
     user_name: Optional[str] = None
 
 

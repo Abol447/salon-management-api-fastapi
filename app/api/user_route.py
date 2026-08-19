@@ -14,8 +14,10 @@ from app.schemas.user import (
 from app.models.role import Role
 from app.models.customer import Customer
 from app.services.user_service import UserService
-
+from app.api.wallet_router import get_wallet_service
 from app.repositories.base.CRUDBase import CRUDBase
+
+from app.api.discount_router import get_discount_service
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -25,7 +27,11 @@ def get_user_service() -> UserService:
     role_repo = CRUDBase(Role)
     customer_repo = CRUDBase(Customer)
     owner_repo = CRUDBase(Owner)
-    return UserService(repo, role_repo, customer_repo, owner_repo)
+    wallet = get_wallet_service()
+    discount_service = get_discount_service()
+    return UserService(
+        repo, role_repo, customer_repo, owner_repo, wallet, discount_service
+    )
 
 
 @router.post("", response_model=ResponseSchema[UserResponse])

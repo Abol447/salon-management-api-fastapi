@@ -25,9 +25,9 @@ class PayPrice(BaseModel):
 
 class AppointmentCreateInternal(BaseModel):
     customer_id: int
-    service_id: list[int]
     start_time: datetime
     description: str | None = None
+    salon_id: int
     paid_price: Decimal | None = None
 
 

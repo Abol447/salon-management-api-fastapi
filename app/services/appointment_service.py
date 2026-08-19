@@ -32,6 +32,11 @@ from app.services.wallet_transaction_service import WalletTransactionService
 from app.models.user import User
 from app.models.role import Role
 from app.services.wallet_service import WalletService
+from app.services.user_service import UserService, UserCreate
+from app.services.appoinmtmentService_service import (
+    AppointmentService_service,
+    AppointmentServiceCreate,
+)
 
 
 class AppointmentService:
@@ -40,48 +45,43 @@ class AppointmentService:
         self,
         repo: AppointmentRepository,
         discount_repo: CRUDBase[Discount, DiscountCreate, DiscountUpdate],
-        user_repo: CRUDBase[User, UserCreate, UserUpdate],
+        user_service: UserService,
         role_repo: CRUDBase[Role, RoleCreate, RoleUpdate],
         customer_repo: CRUDBase[Customer, CustomerCreate, CustomerUpdate],
         owner_repo: CRUDBase[Owner, OwnerCreate, OwnerUpdate],
         transaction: WalletTransactionService,
         wallet: WalletService,
+        appintment_service: AppointmentService_service,
     ):
         self.repo = repo
         self.discount_repo = discount_repo
-        self.user_repo = user_repo
+        self.user_service = user_service
         self.role_repo = role_repo
         self.customer_repo = customer_repo
         self.owner_repo = owner_repo
         self.transaction = transaction
         self.wallet = wallet
+        self.appintment_service = appintment_service
 
     def create(self, db: Session, appointment_data: AppointmentCreate):
         try:
 
-            user = self.user_repo.first_by(db, phone=appointment_data.phone_number)
+            user = self.user_service.first_users(
+                db, phone=appointment_data.phone_number
+            )
 
             if user is None:
 
-                customer_role = self.role_repo.first_by(db, name="customer")
-
-                if customer_role is None:
-                    raise InternalServerException("customer role not found")
-
                 random_password = secrets.token_urlsafe(12)
 
-                user = self.user_repo.create(
+                user = self.user_service.create(
                     db,
-                    obj_in=SystemUserCreate(
+                    UserCreate(
                         phone=appointment_data.phone_number,
-                        password_hash=hash_password(random_password),
-                        role_id=customer_role.id,
+                        password_hash=random_password,
                     ),
                 )
-
-                customer = self.customer_repo.create(
-                    db, obj_in=CustomerCreate(user_id=user.id)
-                )
+                customer = self.customer_repo.first_by(db, user_id=user.id)
 
             else:
 
@@ -96,12 +96,19 @@ class AppointmentService:
                 db,
                 obj_in=AppointmentCreateInternal(
                     customer_id=customer.id,
-                    service_id=appointment_data.service_id,
                     description=appointment_data.description,
+                    salon_id=appointment_data.salon_id,
                     start_time=appointment_data.start_time,
                     paid_price=appointment_data.paid_price,
                 ),
             )
+            for item in appointment_data.service_id:
+                self.appintment_service.create(
+                    db,
+                    AppointmentServiceCreate(
+                        appointment_id=appointment.id, service_id=item
+                    ),
+                )
 
             return appointment
 

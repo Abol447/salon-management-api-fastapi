@@ -17,7 +17,7 @@ class AuthRepository(CRUDBase[Token, TokenCreate, TokenUpdate]):
 
     def login(self, db: Session, user_data: LoginSchema) -> LoginResponse:
 
-        query = db.query(User).filter(User.user_name == user_data.user_name).first()
+        query = db.query(User).filter(User.phone == user_data.phone_number).first()
 
         if query is None:
             return None

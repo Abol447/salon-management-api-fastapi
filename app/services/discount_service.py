@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from app.exceptions import InternalServerException, NotFoundException
 from app.core.logger import logger
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.repositories.discount_repo import DiscountRepo
 from app.core.messages import messages
 
@@ -17,6 +17,11 @@ class DiscountService:
 
     def create(self, db: Session, discount_data: DiscountCreate):
         try:
+            if discount_data.start_date is None:
+                discount_data.start_date = datetime.now()
+
+            if discount_data.end_date is None:
+                discount_data.end_date = discount_data.start_date + timedelta(days=30)
             discount = self.repo.create(db, discount_data)
 
             logger.info(f"discount with id: {discount.id} created successfully")

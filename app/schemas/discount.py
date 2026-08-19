@@ -9,9 +9,11 @@ class DiscountCreate(BaseModel):
 
     percent: Decimal = Field(ge=0, le=100)
 
-    start_date: datetime
+    customer_id: int
 
-    end_date: datetime
+    start_date: datetime | None = None
+
+    end_date: datetime | None = None
 
     max_usage: int = Field(default=1, ge=1)
 
@@ -28,6 +30,8 @@ class DiscountUpdate(BaseModel):
 
     percent: Decimal | None = Field(default=None, ge=0, le=100)
 
+    customer_id: int | None = None
+
     start_date: datetime | None = None
 
     end_date: datetime | None = None
@@ -43,6 +47,7 @@ class DiscountResponse(BaseModel):
     percent: Decimal
     start_date: datetime
     end_date: datetime
+    customer_id: int
     max_usage: int
     is_active: bool
 
