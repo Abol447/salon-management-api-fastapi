@@ -28,3 +28,4 @@ class DiscountUsageService:
                 f"failed to create discount_usage for customer {data_in.customer_id} => {e}"
             )
             raise InternalServerException(messages.DISCOUNT_USAGE_CREATE_FAILED)
+    

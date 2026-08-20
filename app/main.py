@@ -28,6 +28,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from app.api.sms import router as sms_router
+
+app.include_router(sms_router)
+
 
 @app.get("/")
 def root():

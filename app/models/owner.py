@@ -11,6 +11,7 @@ class Owner(Base):
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
 
+    
     user = relationship("User", back_populates="owner")
 
     salons = relationship("Salon", back_populates="owner")

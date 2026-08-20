@@ -37,6 +37,8 @@ from app.services.appoinmtmentService_service import (
     AppointmentService_service,
     AppointmentServiceCreate,
 )
+from app.services.sms_service import SMSService
+from app.utils.password import generate_password
 
 
 class AppointmentService:
@@ -71,8 +73,7 @@ class AppointmentService:
             )
 
             if user is None:
-
-                random_password = secrets.token_urlsafe(12)
+                random_password = generate_password()
 
                 user = self.user_service.create(
                     db,
@@ -82,6 +83,7 @@ class AppointmentService:
                     ),
                 )
                 customer = self.customer_repo.first_by(db, user_id=user.id)
+                SMSService.send_password(appointment_data.phone_number, random_password)
 
             else:
 
