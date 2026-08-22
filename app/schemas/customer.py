@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict
+from app.schemas.user import UserResponse
 
 
 class CustomerCreate(BaseModel):
@@ -18,5 +19,5 @@ class CustomerResponse(BaseModel):
     birthday: datetime | None = None
     profile_image: str | None = None
     user_id: int
-
+    user: UserResponse
     model_config = ConfigDict(from_attributes=True)

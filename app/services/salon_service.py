@@ -1,4 +1,5 @@
 from app.repositories.salon_repository import SalonRepository
+from fastapi import HTTPException
 from app.schemas.salon import CustomerFilterOut, SalonCreate, SalonUpdate
 from app.models.salon import Salon
 from app.exceptions import InternalServerException, NotFoundException
@@ -21,6 +22,8 @@ class SalonService:
 
             return salon
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(f"failed to create salon: {e}")
 

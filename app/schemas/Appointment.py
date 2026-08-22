@@ -5,6 +5,7 @@ from app.schemas.AppointmentService import AppointmentServiceResponse
 from datetime import date
 from pydantic import BaseModel
 from decimal import Decimal
+from app.schemas.customer import CustomerResponse
 
 
 class AppointmentBase(BaseModel):
@@ -48,6 +49,7 @@ class AppointmentOut(BaseModel):
     description: str | None
     paid_price: Decimal | None
     CreatedAt: datetime
+    customer: CustomerResponse
     UpdatedAt: datetime
     salon_id: int
     IsDeleted: bool

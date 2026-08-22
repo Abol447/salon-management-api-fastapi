@@ -1,5 +1,11 @@
 class messages:
+    LOGIN_SUCCESS = "ورود موفقیت آمیز بود"
+    LOGOUT_SUCCESS = "خروج با موفقیت انجام شد"
 
+    TOKEN_REFRESHED = "توکن با موفقیت بروزرسانی شد"
+    TOKEN_REVOKED = "توکن با موفقیت لغو شد"
+    CUSTOMERS_FOUND = "لیست مشتریان با موفقیت دریافت شد"
+    CUSTOMERS_NOT_FOUND = "مشتری‌ای پیدا نشد"
     SERVICE_CREATED = "سرویس با موفقیت ایجاد شد"
     SERVICE_UPDATED = "سرویس با موفقیت ویرایش شد"
     SERVICE_DELETED = "سرویس با موفقیت حذف شد"

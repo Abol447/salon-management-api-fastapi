@@ -27,7 +27,7 @@ def login(
     return ResponseSchema(data=data, message=messages.LOGIN_SUCCESS)
 
 
-@router.post("/logout", response_model=ResponseSchema[None])
+@router.post("/logout", response_model=ResponseSchema[None | str])
 def logout(
     refresh_token: LogOutSchema,
     db: Session = Depends(get_db),

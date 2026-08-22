@@ -7,10 +7,13 @@ from app.schemas.services import (
     ServiceOut,
     ServiceUpdate,
 )
+from app.dependencies.auth import get_current_user
 
 from app.models.services import Service
 from app.services.ServiceService import ServiceService
 from app.core.messages import messages
+from app.api.owner_router import get_service as get_owner_service
+from app.api.salon_router import get_service
 from app.schemas.response import ResponseSchema
 
 router = APIRouter(prefix="/services", tags=["Services"])
@@ -18,7 +21,11 @@ router = APIRouter(prefix="/services", tags=["Services"])
 
 def get_service_service():
     repo = CRUDBase(Service)
-    return ServiceService(repo)
+    salon_service = get_service()
+    owner_service = get_owner_service()
+    return ServiceService(
+        repo, salon_service=salon_service, owner_service=owner_service
+    )
 
 
 @router.post(
@@ -27,9 +34,12 @@ def get_service_service():
 def create_service(
     service_in: ServiceCreate,
     db: Session = Depends(get_db),
+    user: dict = Depends(get_current_user),
     service_service: ServiceService = Depends(get_service_service),
 ):
-    data = service_service.create_service(db, service_in)
+    data = service_service.create_service(
+        db, service_in, user_role=user["role"], user_id=user["sub"]
+    )
 
     return ResponseSchema(data=data, message=messages.SERVICE_CREATED)
 
@@ -45,7 +55,7 @@ def get_services(
 
 
 @router.get("/{service_id}", response_model=ResponseSchema[ServiceOut])
-def get_service(
+def get_services(
     service_id: int,
     db: Session = Depends(get_db),
     service_service: ServiceService = Depends(get_service_service),
