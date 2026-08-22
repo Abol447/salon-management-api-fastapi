@@ -1,4 +1,7 @@
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
+from app.schemas.customer import CustomerResponse
 
 
 class SalonCreate(BaseModel):
@@ -19,3 +22,18 @@ class SalonResponse(BaseModel):
     owner_id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class CustomerFilterOut(BaseModel):
+    customer: CustomerResponse
+    first_name: str | None = None
+    last_name: str | None = None
+    phone: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CustomerFilter(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone: Optional[str] = None

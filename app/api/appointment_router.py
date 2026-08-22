@@ -5,6 +5,8 @@ from app.db.database import get_db
 
 from app.schemas.Appointment import (
     AppointmentCreate,
+    AppointmentFilter,
+    AppointmentFilterOut,
     PayPrice,
     AppointmentUpdate,
     AppointmentOut,
@@ -83,6 +85,17 @@ def get_appointments(
 ):
     appointment = service.get_customer_appointment(db, user["sub"], user["role"])
     return ResponseSchema(data=appointment, message=messages.GET_ALL)
+
+
+@router.get("/search", response_model=ResponseSchema[AppointmentFilterOut])
+def filter_appointments(
+    filter: AppointmentFilter = Depends(),
+    db: Session = Depends(get_db),
+    service: AppointmentService = Depends(get_appointment_service),
+):
+    data = service.filter_appointment(db, filter)
+
+    return ResponseSchema(data=data, message=messages.GET_ALL)
 
 
 @router.get("/{appointment_id}", response_model=ResponseSchema[AppointmentOut])

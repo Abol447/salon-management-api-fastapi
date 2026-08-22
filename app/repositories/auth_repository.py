@@ -46,7 +46,7 @@ class AuthRepository(CRUDBase[Token, TokenCreate, TokenUpdate]):
             .first()
         )
         if db_token is None:
-            raise None
+            return None
         db_token.is_revoked = True
         db.commit()
         db.refresh(db_token)

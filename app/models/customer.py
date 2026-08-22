@@ -15,6 +15,11 @@ class Customer(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), nullable=False, unique=True, index=True
     )
+
+    salon_id: Mapped[int] = mapped_column(
+        ForeignKey("salons.id"), nullable=True, index=True
+    )
+
     wallet = relationship("Wallet", back_populates="customer")
 
     appointments = relationship("Appointment", back_populates="customer")
@@ -22,5 +27,7 @@ class Customer(Base):
     discount = relationship("Discount", back_populates="customer")
 
     user = relationship("User", back_populates="customer")
+
+    salon = relationship("Salon", back_populates="customer")
 
     discount_usages = relationship("DiscountUsage", back_populates="customer")

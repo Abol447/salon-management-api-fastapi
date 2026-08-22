@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Integer, String
+from sqlalchemy import Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.mixins import TimestampMixin
@@ -19,10 +19,15 @@ class Service(Base, TimestampMixin):
         nullable=False,
     )
 
+    salon_id: Mapped[int] = mapped_column(
+        ForeignKey("salons.id"), nullable=True, index=True
+    )
+
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
         nullable=False,
     )
+    salon = relationship("Salon", back_populates="service")
 
     appointment_services = relationship("AppointmentService", back_populates="service")

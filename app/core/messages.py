@@ -7,7 +7,7 @@ class messages:
     SERVICE_CREATE_FAILED = "خطا در ایجاد سرویس"
     SERVICE_UPDATE_FAILED = "خطا در ویرایش سرویس"
     SERVICE_DELETE_FAILED = "خطا در حذف سرویس"
-
+    TOKEN_REFRESHED = "توکن با موفقیت بروزرسانی شد"
     SUCCESS = "عملیات با موفقیت انجام شد"
     CREATED = "با موفقیت ایجاد شد"
     GET_ERROR = "دریافت موفقیت امیز نبود"

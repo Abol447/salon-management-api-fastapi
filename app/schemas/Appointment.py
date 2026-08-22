@@ -2,6 +2,9 @@ from datetime import datetime
 from decimal import Decimal
 from pydantic import BaseModel, ConfigDict
 from app.schemas.AppointmentService import AppointmentServiceResponse
+from datetime import date
+from pydantic import BaseModel
+from decimal import Decimal
 
 
 class AppointmentBase(BaseModel):
@@ -50,3 +53,26 @@ class AppointmentOut(BaseModel):
     IsDeleted: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class AppointmentFilter(BaseModel):
+    customer_id: int | None = None
+    salon_id: int | None = None
+    service_id: int | None = None
+    phone: str | None = None
+
+    start_date: date | None = None
+    end_date: date | None = None
+
+    paid: bool | None = None
+
+    page: int = 1
+    page_size: int = 10
+
+
+class AppointmentFilterOut(BaseModel):
+    appointment: list[AppointmentOut]
+    page_size: int
+    total: int
+    page: int
+    total_page: int

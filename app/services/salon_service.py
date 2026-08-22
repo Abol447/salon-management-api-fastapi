@@ -1,15 +1,16 @@
-from app.repositories.base.CRUDBase import CRUDBase
-from app.schemas.salon import SalonCreate, SalonUpdate
+from app.repositories.salon_repository import SalonRepository
+from app.schemas.salon import CustomerFilterOut, SalonCreate, SalonUpdate
 from app.models.salon import Salon
 from app.exceptions import InternalServerException, NotFoundException
 from app.core.messages import messages
 from sqlalchemy.orm import Session
 from app.core.logger import logger
+from app.schemas.salon import CustomerFilter
 
 
 class SalonService:
 
-    def __init__(self, repo: CRUDBase[Salon, SalonCreate, SalonUpdate]):
+    def __init__(self, repo: SalonRepository):
         self.repo = repo
 
     def create(self, db: Session, data_in: SalonCreate):
@@ -104,3 +105,22 @@ class SalonService:
             logger.error(f"failed to delete salon id:{salon_id} error:{e}")
 
             raise InternalServerException(messages.DELETE_ERROR)
+
+    def search_customer(
+        self, db: Session, user_id: int, user_role: str, filter_data: CustomerFilter
+    ):
+        try:
+
+            data = self.repo.filter_customer(db, user_id, filter_data)
+            return [
+                CustomerFilterOut(
+                    customer=customer,
+                    first_name=first_name,
+                    last_name=last_name,
+                    phone=phone,
+                )
+                for customer, first_name, last_name, phone in data
+            ]
+
+        except Exception as e:
+            raise InternalServerException()

@@ -14,8 +14,12 @@ class Salon(Base, TimestampMixin, SoftDeleteMixin):
 
     location = Column(Text, nullable=False)
 
+    customer = relationship("Customer", back_populates="salon")
+
     appointment = relationship("Appointment", back_populates="salon")
 
     owner_id = Column(Integer, ForeignKey("owners.id"), nullable=False)
+
+    service = relationship("Service", back_populates="salon")
 
     owner = relationship("Owner", back_populates="salons")

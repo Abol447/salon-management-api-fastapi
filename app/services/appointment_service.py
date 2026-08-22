@@ -1,4 +1,5 @@
 from decimal import Decimal
+import math
 import secrets
 
 from sqlalchemy.orm import Session
@@ -7,8 +8,10 @@ from app.repositories.appointment_repository import (
     AppointmentRepository,
     AppointmentCreate,
     AppointmentUpdate,
+    AppointmentFilter,
     CRUDBase,
 )
+from app.schemas.Appointment import AppointmentFilterOut
 from app.core.messages import messages
 from app.core.security import hash_password
 from app.core.logger import logger
@@ -251,3 +254,18 @@ class AppointmentService:
         except Exception as e:
             print(e)
             raise InternalServerException(messages.INTERNAL_SERVER_ERROR)
+
+    def filter_appointment(self, db: Session, filter: AppointmentFilter):
+        try:
+            appointments, total = self.repo.filter(db, filter)
+            logger.success(f"appointment recive secsussfully")
+            return AppointmentFilterOut(
+                page=filter.page,
+                total=total,
+                total_page=math.ceil(total / filter.page_size),
+                page_size=filter.page_size,
+                appointment=appointments,
+            )
+        except Exception as e:
+            logger.error(f"failed to get appointments e =>{e}")
+            raise InternalServerException(messages.INTERNAL_ERROR)
