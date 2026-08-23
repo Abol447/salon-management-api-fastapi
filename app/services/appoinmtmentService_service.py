@@ -55,6 +55,9 @@ class AppointmentService_service:
 
             raise InternalServerException("failed to get appointment_service")
 
+
+    
+    
     def get_all(self, db: Session):
         try:
             services = self.repo.get_all(db)

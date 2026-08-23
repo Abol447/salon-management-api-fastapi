@@ -35,7 +35,7 @@ class WalletTransactionService:
         self.wallet_repo = wallet_repo
         self.customer_repo = customer_repo
 
-    def create(self, db: Session, data_in: WalletTransactionCreate):
+    def create(self, db: Session, data_in: WalletTransactionCreate  , auto_commit : bool = True):
         try:
             wallet = self.wallet_repo.get_by_id(db, data_in.wallet_id)
 
@@ -44,8 +44,7 @@ class WalletTransactionService:
 
             balance, amount = wallet_balance(wallet, data_in.type, data_in.amount)
 
-            if amount == 0:
-                raise BadRequestException("موجودی کافیی نمی باشد ")
+        
 
             self.wallet_repo.update(
                 db, wallet, WalletUpdate(balance=balance), auto_commit=False
@@ -55,8 +54,11 @@ class WalletTransactionService:
 
             transaction = self.repo.create(db, data_in, auto_commit=False)
 
-            db.commit()
-            db.refresh(transaction)
+            if auto_commit :
+                db.commit()
+                db.refresh(transaction)
+            else :
+                db.flush()
 
             return transaction
 
@@ -64,7 +66,8 @@ class WalletTransactionService:
             raise
 
         except Exception:
-            db.rollback()
+            if auto_commit:
+                db.rollback()
             raise
 
     def get_by_id(self, db: Session, id: int, role: str):

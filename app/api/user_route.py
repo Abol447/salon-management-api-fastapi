@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+
+from app.dependencies.auth import get_current_user
 from app.db.database import get_db
 from app.models.owner import Owner
 from app.models.user import User
@@ -51,23 +53,23 @@ def get_users(
     return service.get_all(db)
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/me", response_model=UserResponse)
 def get_user(
-    user_id: int,
+    user : dict = Depends(get_current_user),
     db: Session = Depends(get_db),
     service: UserService = Depends(get_user_service),
 ):
-    return service.get(db, user_id)
+    return service.get(db, user["sub"])
 
 
-@router.patch("/{user_id}", response_model=ResponseSchema[UserResponse])
+@router.patch("/update/me", response_model=ResponseSchema[UserResponse])
 def update_user(
-    user_id: int,
     user_data: UserUpdate,
+    user : dict = Depends(get_current_user),
     db: Session = Depends(get_db),
     service: UserService = Depends(get_user_service),
 ):
-    data = service.update(db, user_id, user_data)
+    data = service.update(db, user["sub"], user_data)
     return ResponseSchema(data=data, message=messages.UPDATED)
 
 

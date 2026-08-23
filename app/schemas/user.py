@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional
-
+from app.schemas.customer import CustomerResponse
 
 class UserBase(BaseModel):
     first_name: Optional[str] = None
@@ -39,5 +39,6 @@ class UserResponse(BaseModel):
     email: Optional[EmailStr]
     is_active: bool
     role_id: int
+    customer : CustomerResponse
 
     model_config = ConfigDict(from_attributes=True)
