@@ -52,7 +52,7 @@ class AppointmentOut(BaseModel):
     customer: CustomerResponse
     UpdatedAt: datetime
     salon_id: int
-    is_paid : bool
+    is_paid : bool | None
     IsDeleted: bool
 
     model_config = ConfigDict(from_attributes=True)
