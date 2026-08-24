@@ -25,3 +25,7 @@ class CustomerResponse(BaseModel):
     last_name: str | None = None
     user_id: int
     model_config = ConfigDict(from_attributes=True)
+
+
+class GetCustomerAppointment(BaseModel):
+    customer_id: int

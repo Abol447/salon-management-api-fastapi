@@ -36,6 +36,4 @@ class UserResponse(BaseModel):
     email: Optional[EmailStr]
     is_active: bool
     role_id: int
-    customer: CustomerResponse
-
     model_config = ConfigDict(from_attributes=True)

@@ -1,7 +1,7 @@
 class messages:
     LOGIN_SUCCESS = "ورود موفقیت آمیز بود"
     LOGOUT_SUCCESS = "خروج با موفقیت انجام شد"
-
+    INVALID_ROLE = "شما به این روت دسترسی ندارید "
     TOKEN_REFRESHED = "توکن با موفقیت بروزرسانی شد"
     TOKEN_REVOKED = "توکن با موفقیت لغو شد"
     CUSTOMERS_FOUND = "لیست مشتریان با موفقیت دریافت شد"

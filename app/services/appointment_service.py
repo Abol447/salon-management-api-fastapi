@@ -15,7 +15,11 @@ from app.schemas.Appointment import AppointmentFilterOut
 from app.core.messages import messages
 from app.core.security import hash_password
 from app.core.logger import logger
-from app.exceptions import InternalServerException, NotFoundException
+from app.exceptions import (
+    BadRequestException,
+    InternalServerException,
+    NotFoundException,
+)
 from fastapi import HTTPException
 from app.schemas.Appointment import AppointmentCreateInternal, PayPrice
 from app.schemas.customer import CustomerCreate, CustomerUpdate
@@ -35,7 +39,7 @@ from app.services.wallet_transaction_service import WalletTransactionService
 from app.models.user import User
 from app.models.role import Role
 from app.services.wallet_service import WalletService
-from app.services.user_service import UserService, UserCreate
+from app.services.user_service import UserService
 from app.services.appoinmtmentService_service import (
     AppointmentService_service,
     AppointmentServiceCreate,
@@ -160,7 +164,11 @@ class AppointmentService:
             raise InternalServerException("Failed to get appointment")
 
     def update(
-        self, db: Session, appointment_id: int, appointment_data: AppointmentUpdate , auto_commit : bool = True
+        self,
+        db: Session,
+        appointment_id: int,
+        appointment_data: AppointmentUpdate,
+        auto_commit: bool = True,
     ):
 
         try:
@@ -171,18 +179,18 @@ class AppointmentService:
                 raise NotFoundException("Appointment not found")
 
             appointment = self.repo.update(
-                db, db_obj=appointment, obj_in=appointment_data , auto_commit= False
+                db, db_obj=appointment, obj_in=appointment_data, auto_commit=False
             )
 
-            if auto_commit :
+            if auto_commit:
                 db.commit()
                 db.refresh(appointment)
-            else :
+            else:
                 db.flush()
             return appointment
 
         except HTTPException:
-            if auto_commit :
+            if auto_commit:
                 db.rollback()
             raise
 
@@ -230,22 +238,24 @@ class AppointmentService:
                 owner = self.owner_repo.first_by(db, user_id=user_id)
                 appointment = self.repo.filter_by(db, salon_id=owner.salons[0].id)
                 logger.info(f"get customer appointment with id : {owner.salons[0].id} ")
+            else:
+                raise BadRequestException(messages.INVALID_ROLE)
 
             return appointment
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"failed to get customer appointment with id : {customer.id} ")
+            logger.error(f"failed to get customer appointment e => {e} ")
             raise InternalServerException(messages.GET_ERROR)
 
-    def pay(self, db: Session, data_in: PayPrice , auto_commit :bool = True):
+    def pay(self, db: Session, data_in: PayPrice, auto_commit: bool = True):
         try:
 
             appointment = self.update(
                 db,
                 data_in.appointment_id,
                 AppointmentUpdate(paid_price=data_in.pay_price),
-                auto_commit=False
+                auto_commit=False,
             )
             wallet = self.wallet.get_by_customer_id(db, data_in.customer_id)
             transaction = self.transaction.create(
@@ -256,23 +266,23 @@ class AppointmentService:
                     type=WalletTranceactionType.CASHBACK,
                     wallet_id=wallet.id,
                 ),
-                auto_commit=False
+                auto_commit=False,
             )
             appointment.is_paid = True
-            if auto_commit :
+            if auto_commit:
                 db.commit()
                 db.refresh(appointment)
-            else :
+            else:
                 db.flush()
 
             return appointment
-        except HTTPException : 
-            raise 
+        except HTTPException:
+            raise
         except Exception as e:
-            if auto_commit : 
+            if auto_commit:
                 db.rollback()
             logger.error(f"failed to pay appointment e -> {e}")
-            
+
             raise InternalServerException(messages.INTERNAL_SERVER_ERROR)
 
     def filter_appointment(self, db: Session, filter: AppointmentFilter):

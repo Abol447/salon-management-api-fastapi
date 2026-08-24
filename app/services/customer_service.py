@@ -6,14 +6,28 @@ from app.models.customer import Customer
 from app.schemas.customer import CustomerCreate, CustomerUpdate
 
 from app.exceptions import InternalServerException, NotFoundException
-
+from app.schemas.customer import GetCustomerAppointment
+from app.models.appointment import Appointment
+from app.schemas.Appointment import AppointmentCreate, AppointmentUpdate
 from app.core.logger import logger
+from app.services.salon_service import SalonService
+from app.core.messages import messages
+from app.services.owner_service import OwnerService
 
 
 class CustomerService:
 
-    def __init__(self, repo: CRUDBase[Customer, CustomerCreate, CustomerUpdate]):
+    def __init__(
+        self,
+        repo: CRUDBase[Customer, CustomerCreate, CustomerUpdate],
+        appointment_repo: CRUDBase[Appointment, AppointmentCreate, AppointmentUpdate],
+        salon_service: SalonService,
+        owner_service: OwnerService,
+    ):
         self.repo = repo
+        self.appointment_repo = appointment_repo
+        self.salon_service = salon_service
+        self.owner_service = owner_service
 
     def create(self, db: Session, customer_data: CustomerCreate):
 
@@ -156,3 +170,24 @@ class CustomerService:
             logger.error(f"failed to delete customer " f"id={customer_id}: {e}")
 
             raise InternalServerException("failed to delete customer")
+
+    def get_appointment(
+        self, db: Session, data_in: GetCustomerAppointment, owner_id: int
+    ):
+        try:
+            owner = self.owner_service.repo.first_by(db, user_id=owner_id)
+            salon = self.salon_service.repo.first_by(db, owner_id=owner.id)
+            if salon is None:
+                raise NotFoundException(messages.NOT_FOUND)
+            appointment = self.appointment_repo.filter_by(
+                db, customer_id=data_in.customer_id, salon_id=salon.id
+            )
+            logger.info(f"get customer {data_in.customer_id} appointment")
+            return appointment
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(
+                f"failed to get customer {data_in.customer_id} appointment e => {e} "
+            )
+            raise InternalServerException()

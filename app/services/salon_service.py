@@ -7,7 +7,6 @@ from app.core.messages import messages
 from sqlalchemy.orm import Session
 from app.core.logger import logger
 from app.schemas.salon import CustomerFilter
-from app.services.customer_service import CustomerService
 
 
 class SalonService:
