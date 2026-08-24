@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, Text, ForeignKey, Numeric , Boolean
+from sqlalchemy import Column, Integer, DateTime, Text, ForeignKey, Numeric, Boolean
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 from app.db.mixins import TimestampMixin, SoftDeleteMixin
@@ -17,7 +17,7 @@ class Appointment(Base, SoftDeleteMixin, TimestampMixin):
 
     salon_id = Column(Integer, ForeignKey("salons.id"), nullable=False)
 
-    is_paid = Column(Boolean , default= False)
+    is_paid = Column(Boolean, default=False)
 
     paid_price = Column(Numeric(10, 2), nullable=True)
 

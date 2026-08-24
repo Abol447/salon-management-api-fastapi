@@ -6,6 +6,7 @@ from datetime import date
 from pydantic import BaseModel
 from decimal import Decimal
 from app.schemas.customer import CustomerResponse
+from app.schemas.user import UserResponse
 
 
 class AppointmentBase(BaseModel):
@@ -22,7 +23,7 @@ class AppointmentCreate(AppointmentBase):
 
 
 class PayPrice(BaseModel):
-    pay_price: Decimal 
+    pay_price: Decimal
     appointment_id: int
     customer_id: int
 
@@ -44,6 +45,7 @@ class AppointmentUpdate(BaseModel):
 class AppointmentOut(BaseModel):
     id: int
     customer_id: int
+
     appointment_services: list[AppointmentServiceResponse]
     start_time: datetime
     description: str | None
@@ -52,7 +54,7 @@ class AppointmentOut(BaseModel):
     customer: CustomerResponse
     UpdatedAt: datetime
     salon_id: int
-    is_paid : bool | None
+    is_paid: bool | None
     IsDeleted: bool
 
     model_config = ConfigDict(from_attributes=True)
@@ -75,6 +77,7 @@ class AppointmentFilter(BaseModel):
 
 class AppointmentFilterOut(BaseModel):
     appointment: list[AppointmentOut]
+    user: UserResponse
     page_size: int
     total: int
     page: int

@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.schemas.Appointment import AppointmentFilter
 from datetime import datetime, date, timedelta
 from app.models.AppointmentService import AppointmentService
+from app.models.user import User
 
 
 class AppointmentRepository(

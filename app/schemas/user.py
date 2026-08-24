@@ -1,6 +1,5 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional
-from app.schemas.customer import CustomerResponse
 
 
 class UserBase(BaseModel):
