@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, DateTime, ForeignKey, String
+from sqlalchemy import Column, Integer, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
@@ -20,6 +20,9 @@ class Customer(Base):
         ForeignKey("salons.id"), nullable=True, index=True
     )
 
+    first_name = Column(String(50), nullable=True)
+
+    last_name = Column(String(50), nullable=True)
     wallet = relationship("Wallet", back_populates="customer")
 
     appointments = relationship("Appointment", back_populates="customer")

@@ -7,6 +7,7 @@ from app.core.messages import messages
 from sqlalchemy.orm import Session
 from app.core.logger import logger
 from app.schemas.salon import CustomerFilter
+from app.services.customer_service import CustomerService
 
 
 class SalonService:
@@ -118,12 +119,11 @@ class SalonService:
             return [
                 CustomerFilterOut(
                     customer=customer,
-                    first_name=first_name,
-                    last_name=last_name,
                     phone=phone,
                 )
-                for customer, first_name, last_name, phone in data
+                for customer, phone in data
             ]
 
         except Exception as e:
+            logger.error(f"failed to filter customer e -> {e}")
             raise InternalServerException()

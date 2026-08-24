@@ -2,9 +2,8 @@ from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional
 from app.schemas.customer import CustomerResponse
 
+
 class UserBase(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
     phone: str
     email: Optional[EmailStr] = None
     role_id: int | None = None
@@ -22,8 +21,7 @@ class SystemUserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
+
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
     role_id: Optional[int] = None
@@ -32,13 +30,12 @@ class UserUpdate(BaseModel):
 
 class UserResponse(BaseModel):
     id: int
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
+
     phone: str
     user_name: Optional[str] = None
     email: Optional[EmailStr]
     is_active: bool
     role_id: int
-    customer : CustomerResponse
+    customer: CustomerResponse
 
     model_config = ConfigDict(from_attributes=True)

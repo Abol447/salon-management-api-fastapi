@@ -21,8 +21,6 @@ class SalonRepository(CRUDBase[Salon, SalonCreate, SalonUpdate]):
         query = (
             db.query(
                 Customer,
-                User.first_name.label("first_name"),
-                User.last_name.label("last_name"),
                 User.phone.label("phone_number"),
             )
             .join(User, User.id == Customer.user_id)
@@ -31,11 +29,13 @@ class SalonRepository(CRUDBase[Salon, SalonCreate, SalonUpdate]):
 
         if customer_filter.first_name:
             query = query.filter(
-                User.first_name.like(f"%{customer_filter.first_name}%")
+                Customer.first_name.like(f"%{customer_filter.first_name}%")
             )
 
         if customer_filter.last_name:
-            query = query.filter(User.last_name.like(f"%{customer_filter.last_name}%"))
+            query = query.filter(
+                Customer.last_name.like(f"%{customer_filter.last_name}%")
+            )
 
         if customer_filter.phone:
             query = query.filter(User.phone.like(f"%{customer_filter.phone}%"))

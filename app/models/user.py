@@ -11,9 +11,7 @@ class User(Base):
 
     user_name = Column(String(100), unique=True, nullable=True)
 
-    first_name = Column(String(50), nullable=True)
-
-    last_name = Column(String(50), nullable=True)
+    
 
     phone = Column(String(15), unique=True, nullable=False, index=True)
 
