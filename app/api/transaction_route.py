@@ -9,7 +9,7 @@ from app.schemas.wallet_transaction import WalletTransactionCreate, WalletTransa
 from app.services.wallet_transaction_service import WalletTransactionService
 from app.repositories.base.CRUDBase import CRUDBase
 from app.models.wallet_transaction import WalletTransaction
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import require_roles
 from app.schemas.response import ResponseSchema
 from app.core.messages import messages
 
@@ -40,7 +40,7 @@ def create_wallet_transaction(
 def get_transaction(
     db: Session = Depends(get_db),
     service: WalletTransactionService = Depends(get_wallet_transaction_service),
-    user: dict = Depends(get_current_user),
+    user: dict = Depends(require_roles("customer")),
 ):
     return ResponseSchema(
         data=service.get_by_id(db, user["sub"], user["role"]), message=messages.GET_ALL

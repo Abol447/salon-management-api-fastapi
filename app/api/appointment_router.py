@@ -29,13 +29,14 @@ from app.api.wallet_router import get_wallet_service
 from app.api.transaction_route import get_wallet_transaction_service
 from app.api.user_route import get_user_service
 from app.api.appointmentService_router import get_service
+from app.api.salon_router import get_service as get_salon_service
 
 router = APIRouter(prefix="/appointments", tags=["Appointments"])
 
 
 def get_appointment_service() -> AppointmentService:
     repo = AppointmentRepository()
-
+    salon_service = get_salon_service()
     discount_repo = CRUDBase(Discount)
     user_repo = get_user_service()
     role_repo = CRUDBase(Role)
@@ -53,6 +54,7 @@ def get_appointment_service() -> AppointmentService:
         owner_repo,
         transaction,
         wallet,
+        salon_service,
         aappointment_service,
     )
 

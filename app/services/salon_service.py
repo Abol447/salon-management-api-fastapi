@@ -63,18 +63,18 @@ class SalonService:
 
             raise InternalServerException(messages.GET_ERROR)
 
-    def update(self, db: Session, salon_id: int, data_in: SalonUpdate):
+    def update(self, db: Session, user_id: int, data_in: SalonUpdate):
         try:
-            salon = self.repo.get_by_id(db, salon_id)
+            salon = self.get_salon_by_user_id(db, user_id)
 
             if not salon:
-                logger.warning(f"salon not found for update id:{salon_id}")
+                logger.warning(f"salon not found for update ")
 
                 raise NotFoundException(messages.NOT_FOUND)
 
             salon = self.repo.update(db, salon, data_in)
 
-            logger.info(f"salon updated id:{salon_id}")
+            logger.info(f"salon updated id:{salon.id}")
 
             return salon
 

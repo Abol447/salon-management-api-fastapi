@@ -41,6 +41,18 @@ def search(
     )
 
 
+@router.put("", response_model=ResponseSchema[SalonResponse])
+def update(
+    data_in: SalonUpdate,
+    user: dict = Depends(require_roles("owner")),
+    db: Session = Depends(get_db),
+    service: SalonService = Depends(get_service),
+):
+    return ResponseSchema(
+        data=service.update(db, user["sub"], data_in), message=messages.UPDATED
+    )
+
+
 @router.get("/user_id", response_model=ResponseSchema[SalonResponse])
 def get_by_user_id(
     user: dict = Depends(require_roles("owner")),

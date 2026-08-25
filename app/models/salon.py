@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DECIMAL
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
@@ -13,6 +13,8 @@ class Salon(Base, TimestampMixin, SoftDeleteMixin):
     name = Column(String(150), nullable=False)
 
     location = Column(Text, nullable=False)
+
+    back_percent = Column(DECIMAL(3, 1), default=DECIMAL("10"))
 
     customer = relationship("Customer", back_populates="salon")
 

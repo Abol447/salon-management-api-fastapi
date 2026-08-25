@@ -46,6 +46,7 @@ from app.services.appoinmtmentService_service import (
 )
 from app.services.sms_service import SMSService
 from app.utils.password import generate_password
+from app.services.salon_service import SalonService
 
 
 class AppointmentService:
@@ -60,12 +61,14 @@ class AppointmentService:
         owner_repo: CRUDBase[Owner, OwnerCreate, OwnerUpdate],
         transaction: WalletTransactionService,
         wallet: WalletService,
+        salon_service: SalonService,
         appintment_service: AppointmentService_service,
     ):
         self.repo = repo
         self.discount_repo = discount_repo
         self.user_service = user_service
         self.role_repo = role_repo
+        self.salon_service = salon_service
         self.customer_repo = customer_repo
         self.owner_repo = owner_repo
         self.transaction = transaction
@@ -257,12 +260,13 @@ class AppointmentService:
                 AppointmentUpdate(paid_price=data_in.pay_price),
                 auto_commit=False,
             )
+            salon = self.salon_service.get(db, appointment.salon_id)
             wallet = self.wallet.get_by_customer_id(db, data_in.customer_id)
             transaction = self.transaction.create(
                 db,
                 data_in=WalletTransactionCreate(
                     appointment_id=data_in.appointment_id,
-                    amount=data_in.pay_price * Decimal("0.1"),
+                    amount=data_in.pay_price * (salon.back_percent / Decimal("100")),
                     type=WalletTranceactionType.CASHBACK,
                     wallet_id=wallet.id,
                 ),

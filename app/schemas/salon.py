@@ -1,5 +1,5 @@
 from typing import Optional
-
+from decimal import Decimal
 from pydantic import BaseModel, ConfigDict
 from app.schemas.customer import CustomerResponse
 
@@ -7,12 +7,14 @@ from app.schemas.customer import CustomerResponse
 class SalonCreate(BaseModel):
     name: str
     location: str
+    back_percent: Decimal
     owner_id: int
 
 
 class SalonUpdate(BaseModel):
     name: str | None = None
     location: str | None = None
+    back_percent: Decimal | None = None
 
 
 class SalonResponse(BaseModel):
@@ -20,6 +22,7 @@ class SalonResponse(BaseModel):
     name: str
     location: str
     owner_id: int
+    back_percent: Decimal
 
     model_config = ConfigDict(from_attributes=True)
 
