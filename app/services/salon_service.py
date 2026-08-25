@@ -126,3 +126,16 @@ class SalonService:
         except Exception as e:
             logger.error(f"failed to filter customer e -> {e}")
             raise InternalServerException()
+
+    def get_salon_by_user_id(self, db: Session, user_id):
+        try:
+            salon = self.repo.get_salon_by_user_id(db, user_id)
+            if salon is None:
+                raise NotFoundException(messages.NOT_FOUND)
+            logger.info(f"get salon by user id :{user_id}")
+            return salon
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"failed to get salon by user_id e => {e}")
+            raise InternalServerException(messages.INTERNAL_SERVER_ERROR)

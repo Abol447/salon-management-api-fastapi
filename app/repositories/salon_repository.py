@@ -41,3 +41,12 @@ class SalonRepository(CRUDBase[Salon, SalonCreate, SalonUpdate]):
             query = query.filter(User.phone.like(f"%{customer_filter.phone}%"))
 
         return query.all()
+
+    def get_salon_by_user_id(self, db: Session, user_id):
+        query = (
+            db.query(Salon)
+            .join(Owner, Owner.id == Salon.owner_id)
+            .filter(Owner.user_id == user_id)
+            .first()
+        )
+        return query
