@@ -16,7 +16,7 @@ class SalonRepository(CRUDBase[Salon, SalonCreate, SalonUpdate]):
     def filter_customer(
         self, db: Session, user_id: int, customer_filter: CustomerFilter
     ):
-        salon = self.first_by(db, user_id=user_id)
+        salon = self.get_salon_by_user_id(db,user_id=user_id)
 
         query = (
             db.query(
