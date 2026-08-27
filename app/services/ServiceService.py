@@ -45,9 +45,13 @@ class ServiceService:
     def get_service(self, db: Session, service_id: int):
         try:
             service = self.repo.get_by_id(db, service_id)
+            if service is None : 
+                raise BadRequestException(messages.SERVICE_NOT_FOUND)
 
             return service
-
+        except HTTPException : 
+            raise
+        
         except Exception as e:
             logger.exception(f"Error getting service {service_id}: {e}")
             raise InternalServerException()

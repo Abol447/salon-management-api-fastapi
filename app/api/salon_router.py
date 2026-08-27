@@ -31,7 +31,7 @@ def search(
     filter: CustomerFilter = Depends(),
     db: Session = Depends(get_db),
     service: SalonService = Depends(get_service),
-    user: dict = Depends(get_current_user),
+    user: dict = Depends(require_roles("owner")),
 ):
     return ResponseSchema(
         data=service.search_customer(
