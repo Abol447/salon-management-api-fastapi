@@ -9,6 +9,7 @@ from app.schemas.Appointment import (
     AppointmentFilterOut,
     PayPrice,
     AppointmentUpdate,
+    AppointmentServicesUpdate,
     AppointmentOut,
 )
 from app.models.owner import Owner
@@ -109,6 +110,18 @@ def get_appointment(
     data = service.get_by_id(db, appointment_id)
 
     return ResponseSchema(data=data, message=messages.APPOINTMENT_FOUND)
+
+
+@router.put("/services", response_model=ResponseSchema[None])
+def update_services(
+    data_in: AppointmentServicesUpdate,
+    service: AppointmentService = Depends(get_appointment_service),
+    db: Session = Depends(get_db),
+):
+    service.update_services(db, data_in)
+    return ResponseSchema(
+        message=messages.UPDATED,
+    )
 
 
 @router.put("/{appointment_id}", response_model=ResponseSchema[AppointmentOut])

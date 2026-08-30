@@ -1,11 +1,16 @@
 from app.repositories.base.CRUDBase import CRUDBase
 from app.models.appointment import Appointment
-from app.schemas.Appointment import AppointmentCreate, AppointmentUpdate
+from app.schemas.Appointment import (
+    AppointmentCreate,
+    AppointmentUpdate,
+    AppointmentServicesUpdate,
+)
 from sqlalchemy.orm import Session
 from app.schemas.Appointment import AppointmentFilter
 from datetime import datetime, date, timedelta
 from app.models.AppointmentService import AppointmentService
 from app.models.user import User
+from app.schemas.AppointmentService import AppointmentServiceCreate
 
 
 class AppointmentRepository(
@@ -50,3 +55,38 @@ class AppointmentRepository(
         )
 
         return appointments, total
+
+    def update_appointment_service(self, db: Session, data: AppointmentServicesUpdate):
+        service_ids = [
+            row[0]
+            for row in (
+                db.query(AppointmentService.service_id)
+                .filter(AppointmentService.appointment_id == data.appointment_id)
+                .all()
+            )
+        ]
+
+        for service_id in data.appointment_services:
+            if service_id not in service_ids:
+                db.add(
+                    AppointmentService(
+                        service_id=service_id,
+                        appointment_id=data.appointment_id,
+                    )
+                )
+
+        for service_id in service_ids:
+            if service_id not in data.appointment_services:
+                appointment_service = (
+                    db.query(AppointmentService)
+                    .filter(
+                        AppointmentService.service_id == service_id,
+                        AppointmentService.appointment_id == data.appointment_id,
+                    )
+                    .first()
+                )
+
+                if appointment_service:
+                    db.delete(appointment_service)
+
+        db.commit()

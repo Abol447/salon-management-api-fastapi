@@ -6,6 +6,7 @@ from app.models.customer import Customer
 from app.models.user import User
 from app.models.owner import Owner
 from app.repositories.base.CRUDBase import CRUDBase
+from app.models.services import Service
 
 
 class SalonRepository(CRUDBase[Salon, SalonCreate, SalonUpdate]):
@@ -16,7 +17,7 @@ class SalonRepository(CRUDBase[Salon, SalonCreate, SalonUpdate]):
     def filter_customer(
         self, db: Session, user_id: int, customer_filter: CustomerFilter
     ):
-        salon = self.get_salon_by_user_id(db,user_id=user_id)
+        salon = self.get_salon_by_user_id(db, user_id=user_id)
 
         query = (
             db.query(
@@ -50,3 +51,6 @@ class SalonRepository(CRUDBase[Salon, SalonCreate, SalonUpdate]):
             .first()
         )
         return query
+
+    def get_services_by_salon_id(self, db: Session, salon_id):
+        return db.query(Service).filter(Service.salon_id == salon_id).all()

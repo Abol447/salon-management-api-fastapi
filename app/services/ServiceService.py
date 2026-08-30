@@ -45,13 +45,13 @@ class ServiceService:
     def get_service(self, db: Session, service_id: int):
         try:
             service = self.repo.get_by_id(db, service_id)
-            if service is None : 
+            if service is None:
                 raise BadRequestException(messages.SERVICE_NOT_FOUND)
 
             return service
-        except HTTPException : 
+        except HTTPException:
             raise
-        
+
         except Exception as e:
             logger.exception(f"Error getting service {service_id}: {e}")
             raise InternalServerException()
@@ -79,12 +79,8 @@ class ServiceService:
 
     def delete_service(self, db: Session, service_id: int):
         try:
-            service = self.repo.get_by_id(db, service_id)
 
-            if not service:
-                raise NotFoundException("services")
-
-            return self.repo.remove(db, id=service_id)
+            return self.repo.delete(db, service_id)
 
         except Exception as e:
             logger.exception(f"Error deleting service {service_id}: {e}")

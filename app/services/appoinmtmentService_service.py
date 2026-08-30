@@ -55,9 +55,6 @@ class AppointmentService_service:
 
             raise InternalServerException("failed to get appointment_service")
 
-
-    
-    
     def get_all(self, db: Session):
         try:
             services = self.repo.get_all(db)
@@ -104,8 +101,8 @@ class AppointmentService_service:
 
     def delete(self, db: Session, appointment_service_id: int):
         try:
-            appointment = self.get(db, appointment_service_id)
-            service = self.repo.delete(db, appointment)
+
+            service = self.repo.delete(db, appointment_service_id)
 
             logger.info(f"appointment_service deleted " f"id={appointment_service_id}")
 

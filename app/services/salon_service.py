@@ -139,3 +139,12 @@ class SalonService:
         except Exception as e:
             logger.error(f"failed to get salon by user_id e => {e}")
             raise InternalServerException(messages.INTERNAL_SERVER_ERROR)
+
+    def get_services_by_salon_id(self, db: Session, salon_id: int):
+        try:
+            services = self.repo.get_services_by_salon_id(db, salon_id)
+            logger.info("services recived seccussfuly")
+            return services
+        except Exception as e:
+            logger.error(f"failed to get services by salon_id ({salon_id}) e => {e}")
+            raise InternalServerException(messages.INTERNAL_SERVER_ERROR)

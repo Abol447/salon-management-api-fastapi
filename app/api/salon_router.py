@@ -7,6 +7,7 @@ from app.schemas.salon import SalonResponse, CustomerFilterOut, CustomerFilter
 from sqlalchemy.orm import Session
 from app.core.messages import messages
 from app.dependencies.auth import get_current_user, require_roles
+from app.schemas.services import ServiceOut
 
 router = APIRouter(prefix="/salon", tags=["salon"])
 
@@ -61,4 +62,15 @@ def get_by_user_id(
 ):
     return ResponseSchema(
         data=service.get_salon_by_user_id(db, user["sub"]), message=messages.GET_ALL
+    )
+
+
+@router.get("/{salon-id}/services", response_model=ResponseSchema[list[ServiceOut]])
+def get_services_by_salon_id(
+    salon_id: int,
+    db: Session = Depends(get_db),
+    service: SalonService = Depends(get_service),
+):
+    return ResponseSchema(
+        message=messages.GET_ALL, data=service.get_services_by_salon_id(db, salon_id)
     )

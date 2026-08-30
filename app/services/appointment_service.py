@@ -43,6 +43,7 @@ from app.services.user_service import UserService
 from app.services.appoinmtmentService_service import (
     AppointmentService_service,
     AppointmentServiceCreate,
+    AppointmentServiceUpdate,
 )
 from app.services.sms_service import SMSService
 from app.utils.password import generate_password
@@ -74,6 +75,13 @@ class AppointmentService:
         self.transaction = transaction
         self.wallet = wallet
         self.appintment_service = appintment_service
+
+    def update_services(self, db: Session, update_data: AppointmentServiceUpdate):
+        try:
+            self.repo.update_appointment_service(db, update_data)
+        except Exception as e:
+            logger.error(f"failed to updated appointment_services e =>{e}")
+            raise InternalServerException(messages.INTERNAL_SERVER_ERROR)
 
     def create(self, db: Session, appointment_data: AppointmentCreate):
         try:

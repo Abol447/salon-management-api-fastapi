@@ -42,6 +42,11 @@ class AppointmentUpdate(BaseModel):
     paid_price: Decimal | None = None
 
 
+class AppointmentServicesUpdate(BaseModel):
+    appointment_services: list[int] | None
+    appointment_id: int
+
+
 class AppointmentOut(BaseModel):
     id: int
     customer_id: int

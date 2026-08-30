@@ -17,3 +17,8 @@ class AppointmentServiceResponse(BaseModel):
     service_id: int
 
     model_config = {"from_attributes": True}
+
+
+class AppointmentServiceDelete(BaseModel):
+    service_id: int
+    appointment_id: int
