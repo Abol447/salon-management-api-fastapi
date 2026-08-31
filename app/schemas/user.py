@@ -12,6 +12,8 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password_hash: str
 
+class UserCreateIn(UserCreate):
+    salon_id: int | None = None
 
 class SystemUserCreate(BaseModel):
     phone: str

@@ -12,6 +12,7 @@ from app.schemas.user import (
     UserCreate,
     UserUpdate,
     UserResponse,
+    UserCreateIn
 )
 from app.models.role import Role
 from app.models.customer import Customer
@@ -38,7 +39,7 @@ def get_user_service() -> UserService:
 
 @router.post("", response_model=ResponseSchema[UserResponse])
 def create_user(
-    user_data: UserCreate,
+    user_data: UserCreateIn,
     db: Session = Depends(get_db),
     service: UserService = Depends(get_user_service),
 ):

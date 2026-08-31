@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserUpdate, UserCreateIn
 from app.repositories.base.CRUDBase import CRUDBase
 from app.core.messages import messages
 from app.services.role_service import RoleService
@@ -9,7 +9,11 @@ from app.services.customer_service import CustomerService
 from app.exceptions import ForbiddenException
 from app.core.security import hash_password
 from app.core.logger import logger
-from app.exceptions import InternalServerException, NotFoundException
+from app.exceptions import (
+    InternalServerException,
+    NotFoundException,
+    BadRequestException,
+)
 from app.schemas.customer import CustomerCreate
 from app.models.customer import Customer
 from app.models.role import Role
@@ -21,6 +25,7 @@ from app.schemas.owner import OwnerCreate, OwnerUpdate
 from app.services.wallet_service import WalletService, WalletCreate
 from app.services.discount_service import DiscountService, DiscountCreate
 from decimal import Decimal
+from app.utils.customer import create_customer
 
 
 class UserService:
@@ -41,9 +46,10 @@ class UserService:
         self.wallet_service = wallet_service
         self.discount_service = discount_service
 
-    def create(self, db: Session, user_data: UserCreate):
+    def create(self, db: Session, user_data: UserCreateIn):
 
         try:
+            user = self.repository.first_by(db, phone=user_data.phone)
             if user_data.role_id is None:
                 role = self.role_service.first_by(db, name="customer")
                 if role is None:
@@ -51,49 +57,61 @@ class UserService:
                 user_data.role_id = role.id
             else:
                 role = self.role_service.get_by_id(db, user_data.role_id)
+            if user is None:
+                user_data.password_hash = hash_password(user_data.password_hash)
 
-            user_data.password_hash = hash_password(user_data.password_hash)
-
-            if user_data.user_name:
-                user_name = self.repository.filter_by(db, user_name=user_data.user_name)
-                print(user_data.user_name)
-                if len(user_name):
-                    logger.warning(
-                        f"Duplicate entry {user_data.user_name} for key 'user_name' "
+                if user_data.user_name:
+                    user_name = self.repository.filter_by(
+                        db, user_name=user_data.user_name
                     )
-                    raise ForbiddenException(messages.USERNAME_ALREADY_EXISTS)
-            if user_data.email:
-                email = self.repository.filter_by(db, email=user_data.email)
-                if len(email) > 0:
-                    logger.warning(f"Duplicate entry {user_data.email} for key 'email'")
-                    raise ForbiddenException(messages.EMAIL_ALREADY_EXISTS)
+                    if len(user_name):
+                        logger.warning(
+                            f"Duplicate entry {user_data.user_name} for key 'user_name' "
+                        )
+                        raise ForbiddenException(messages.USERNAME_ALREADY_EXISTS)
+                if user_data.email:
+                    email = self.repository.filter_by(db, email=user_data.email)
+                    if len(email) > 0:
+                        logger.warning(
+                            f"Duplicate entry {user_data.email} for key 'email'"
+                        )
+                        raise ForbiddenException(messages.EMAIL_ALREADY_EXISTS)
 
-            response = self.repository.create(db, user_data, auto_commit=False)
-            if role.name.lower() == "customer":
-                customer = self.customer_service.create(
-                    db, CustomerCreate(user_id=response.id), auto_commit=False
-                )
-                wallet = self.wallet_service.create(
-                    db, WalletCreate(customer_id=customer.id), auto_commit=False
-                )
-                discount = self.discount_service.create(
+                user = self.repository.create(
                     db,
-                    DiscountCreate(
-                        customer_id=customer.id,
-                        max_usage=1,
-                        is_active=True,
-                        percent=Decimal("10"),
-                        title="welcom",
+                    UserCreate(
+                        user_name=user_data.user_name,
+                        phone=user_data.phone,
+                        email=user_data.email,
+                        password_hash=user_data.password_hash,
+                        role_id=user_data.role_id,
                     ),
+                    auto_commit=False,
+                )
+            else:
+                customer_db = self.customer_service.first_by(
+                    db, salon_id=user_data.salon_id, user_id=user.id
+                )
+                if customer_db:
+                    raise ForbiddenException(messages.USER_ALREADY_EXISTS)
+
+            if role.name.lower() == "customer":
+                customer, wallet, discount = create_customer(
+                    customer_service=self.customer_service,
+                    db=db,
+                    discount_service=self.discount_service,
+                    wallet_service=self.wallet_service,
+                    user=user,
+                    salon_id=user_data.salon_id,
                 )
                 print(wallet)
             if role.name.lower() == "owner":
-                self.owner.create(db, OwnerCreate(user_id=response.id))
+                self.owner.create(db, OwnerCreate(user_id=user.id))
 
             db.commit()
-            db.refresh(response)
-            logger.info(f"user created successfully id={response.id}")
-            return response
+            db.refresh(user)
+            logger.info(f"user created successfully id={user.id}")
+            return user
 
         except HTTPException:
             raise

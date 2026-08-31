@@ -13,7 +13,7 @@ class Customer(Base):
     profile_image: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), nullable=False, unique=True, index=True
+        ForeignKey("users.id"), nullable=False, index=True
     )
 
     salon_id: Mapped[int] = mapped_column(

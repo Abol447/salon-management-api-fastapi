@@ -7,6 +7,7 @@ class CustomerCreate(BaseModel):
     birthday: datetime | None = None
     profile_image: str | None = None
     user_id: int
+    salon_id : int
     first_name: str | None = None
     last_name: str | None = None
 

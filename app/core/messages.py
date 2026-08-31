@@ -4,6 +4,7 @@ class messages:
     INVALID_ROLE = "شما به این روت دسترسی ندارید "
     TOKEN_REFRESHED = "توکن با موفقیت بروزرسانی شد"
     TOKEN_REVOKED = "توکن با موفقیت لغو شد"
+    USER_ALREADY_EXISTS = "این کاربر در حال حاضر وجود دارد"
     CUSTOMERS_FOUND = "لیست مشتریان با موفقیت دریافت شد"
     CUSTOMERS_NOT_FOUND = "مشتری‌ای پیدا نشد"
     SERVICE_CREATED = "سرویس با موفقیت ایجاد شد"

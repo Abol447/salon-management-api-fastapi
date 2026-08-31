@@ -24,7 +24,7 @@ from fastapi import HTTPException
 from app.schemas.Appointment import AppointmentCreateInternal, PayPrice
 from app.schemas.customer import CustomerCreate, CustomerUpdate
 from app.schemas.discount import DiscountCreate, DiscountUpdate
-from app.schemas.user import UserCreate, UserUpdate, SystemUserCreate
+from app.schemas.user import UserCreateIn, UserUpdate, SystemUserCreate
 from app.schemas.role import RoleCreate, RoleUpdate
 from app.models.owner import Owner
 from app.schemas.wallet_transaction import (
@@ -48,6 +48,7 @@ from app.services.appoinmtmentService_service import (
 from app.services.sms_service import SMSService
 from app.utils.password import generate_password
 from app.services.salon_service import SalonService
+from app.utils.customer import create_customer
 
 
 class AppointmentService:
@@ -95,12 +96,16 @@ class AppointmentService:
 
                 user = self.user_service.create(
                     db,
-                    UserCreate(
+                    UserCreateIn(
                         phone=appointment_data.phone_number,
                         password_hash=random_password,
+                        salon_id=appointment_data.salon_id,
                     ),
                 )
-                customer = self.customer_repo.first_by(db, user_id=user.id)
+                customer = self.customer_repo.first_by(
+                    db, user_id=user.id, salon_id=appointment_data.salon_id
+                )
+
                 SMSService.send_password(appointment_data.phone_number, random_password)
 
             else:
@@ -108,8 +113,12 @@ class AppointmentService:
                 customer = self.customer_repo.first_by(db, user_id=user.id)
 
                 if customer is None:
-                    customer = self.customer_repo.create(
-                        db, obj_in=CustomerCreate(user_id=user.id)
+                    customer, wallet, discount = create_customer(
+                        customer_service=self.customer_repo,
+                        wallet_service=self.wallet,
+                        discount_service=self.discount_repo,
+                        user=user,
+                        salon_id=appointment_data.salon_id,
                     )
 
             appointment = self.repo.create(
