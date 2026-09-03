@@ -14,6 +14,11 @@ class ServiceUpdate(BaseModel):
     is_active: bool | None = None
 
 
+class ServiceRes(BaseModel):
+    id: int
+    name: str
+
+
 class ServiceOut(BaseModel):
     id: int
     name: str

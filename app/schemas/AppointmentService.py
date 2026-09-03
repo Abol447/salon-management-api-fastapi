@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from app.schemas.services import ServiceRes
 
 
 class AppointmentServiceCreate(BaseModel):
@@ -15,7 +16,7 @@ class AppointmentServiceResponse(BaseModel):
     id: int
     appointment_id: int
     service_id: int
-
+    service: ServiceRes
     model_config = {"from_attributes": True}
 
 

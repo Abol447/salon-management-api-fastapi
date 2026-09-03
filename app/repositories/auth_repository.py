@@ -26,7 +26,7 @@ class AuthRepository(CRUDBase[Token, TokenCreate, TokenUpdate]):
         if not islogin:
             return None
 
-        refresh_token = self.create_refresh_token(db, query.id)
+        refresh_token = self.create_refresh_token(db, query.id, str(query.role.name))
         access_token = create_token(
             {"sub": str(query.id), "type": "access", "role": str(query.role.name)}
         )
@@ -68,11 +68,14 @@ class AuthRepository(CRUDBase[Token, TokenCreate, TokenUpdate]):
         db.commit()
         db.refresh(db_refresh_token)
 
-        new_refresh_token = self.create_refresh_token(db, refresh_decode["sub"])
+        new_refresh_token = self.create_refresh_token(
+            db, refresh_decode["sub"], role=refresh_decode["role"]
+        )
 
         access_token = create_token(
             {
                 "sub": refresh_decode["sub"],
+                "role": refresh_decode["role"],
                 "type": "access",
             }
         )
@@ -81,7 +84,7 @@ class AuthRepository(CRUDBase[Token, TokenCreate, TokenUpdate]):
             access_token=access_token, refresh_token=new_refresh_token.refresh_token
         )
 
-    def create_refresh_token(self, db: Session, user_id: int) -> Token:
+    def create_refresh_token(self, db: Session, user_id: int, role) -> Token:
         active_token = (
             db.query(Token)
             .filter(
@@ -95,10 +98,7 @@ class AuthRepository(CRUDBase[Token, TokenCreate, TokenUpdate]):
         if active_token:
             return active_token
         refresh_token = create_token(
-            {
-                "sub": str(user_id),
-                "type": "refresh",
-            },
+            {"sub": str(user_id), "type": "refresh", "role": role},
             timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
         )
 
