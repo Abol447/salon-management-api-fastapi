@@ -8,7 +8,7 @@ class SalonCreate(BaseModel):
     name: str
     location: str
     back_percent: Decimal
-    owner_id: int
+    owner_id: int | None = None
 
 
 class SalonUpdate(BaseModel):

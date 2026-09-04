@@ -8,22 +8,25 @@ from sqlalchemy.orm import Session
 from app.core.messages import messages
 from app.dependencies.auth import get_current_user, require_roles
 from app.schemas.services import ServiceOut
+from app.api.owner_router import get_service as owner_service
 
 router = APIRouter(prefix="/salon", tags=["salon"])
 
 
 def get_service():
     repo = SalonRepository()
-    return SalonService(repo)
+    owner = owner_service()
+    return SalonService(repo, owner_service=owner)
 
 
 @router.post("", response_model=ResponseSchema[SalonResponse])
 def create(
     data_in: SalonCreate,
     db: Session = Depends(get_db),
+    user: dict = Depends(require_roles("owner")),
     service: SalonService = Depends(get_service),
 ):
-    data = service.create(db, data_in)
+    data = service.create(db, data_in, user_id=user["sub"])
     return ResponseSchema(data=data, message=messages.CREATED)
 
 

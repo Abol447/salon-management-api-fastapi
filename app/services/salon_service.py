@@ -7,15 +7,23 @@ from app.core.messages import messages
 from sqlalchemy.orm import Session
 from app.core.logger import logger
 from app.schemas.salon import CustomerFilter
+from app.services.owner_service import OwnerService
 
 
 class SalonService:
 
-    def __init__(self, repo: SalonRepository):
+    def __init__(self, repo: SalonRepository, owner_service: OwnerService):
         self.repo = repo
+        self.owner_service = owner_service
 
-    def create(self, db: Session, data_in: SalonCreate):
+    def create(self, db: Session, data_in: SalonCreate, user_id: int):
         try:
+            owner = self.owner_service.repo.first_by(db, user_id=user_id)
+            if owner is None:
+                raise NotFoundException(messages.NOT_FOUND)
+
+            data_in.owner_id = owner.id
+
             salon = self.repo.create(db, data_in)
 
             logger.info(f"salon created id:{salon.id}")

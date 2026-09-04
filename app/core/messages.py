@@ -50,7 +50,7 @@ class messages:
     USER_DELETED = "کاربر با موفقیت حذف شد"
     USER_NOT_FOUND = "کاربر پیدا نشد"
     USER_CREATED_ERROR = "ساخت کاربر موفقیت آمیز نبود "
-    USER_UPDATED_ERROR = "اپدیت کردن کاربر موقثیت امیز نبود"
+    USER_UPDATED_ERROR = "اپدیت کردن کاربر موفقیت امیز نبود"
     USER_GET_ERROR = "دریافت کاربر موفقیت امیز نیود"
 
     USERNAME_ALREADY_EXISTS = "این نام کاربری قبلاً استفاده شده است"
