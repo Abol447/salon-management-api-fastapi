@@ -11,8 +11,11 @@ from dotenv import load_dotenv
 from app.models import *
 from app.db.base import Base
 
+# Load .env from project root
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
+ENV_FILE = BASE_DIR / ".env"
+
+load_dotenv(ENV_FILE)
 
 config = context.config
 
@@ -29,11 +32,17 @@ def get_database_url() -> str:
     password = os.getenv("DATABASE_PASSWORD")
     database = os.getenv("DATABASE_NAME")
 
+    if not all([host, port, user, password, database]):
+        raise RuntimeError(
+            f"Database configuration is incomplete. "
+            f"HOST={host}, PORT={port}, USER={user}, "
+            f"DATABASE={database}"
+        )
+
     return f"mysql+pymysql://" f"{user}:{password}@{host}:{port}/{database}"
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in offline mode."""
     url = get_database_url()
 
     context.configure(
@@ -48,14 +57,14 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in online mode."""
+    database_url = get_database_url()
 
     configuration = config.get_section(
         config.config_ini_section,
         {},
     )
 
-    configuration["sqlalchemy.url"] = get_database_url()
+    configuration["sqlalchemy.url"] = database_url
 
     connectable = engine_from_config(
         configuration,
