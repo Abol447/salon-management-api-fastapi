@@ -1,5 +1,6 @@
 from logging.config import fileConfig
 import os
+from pathlib import Path
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -10,17 +11,14 @@ from dotenv import load_dotenv
 from app.models import *
 from app.db.base import Base
 
-# Load .env
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
-# Alembic Config object
 config = context.config
 
-# Logging configuration
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Metadata for autogenerate
 target_metadata = Base.metadata
 
 
