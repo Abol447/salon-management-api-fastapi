@@ -12,8 +12,10 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password_hash: str
 
+
 class UserCreateIn(UserCreate):
     salon_id: int | None = None
+
 
 class SystemUserCreate(BaseModel):
     phone: str
@@ -25,6 +27,7 @@ class UserUpdate(BaseModel):
 
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
+    user_name: Optional[str] = None
     role_id: Optional[int] = None
     is_active: Optional[bool] = None
 

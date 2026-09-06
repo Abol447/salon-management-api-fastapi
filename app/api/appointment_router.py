@@ -141,6 +141,7 @@ def delete_appointment(
     appointment_id: int,
     service: AppointmentService = Depends(get_appointment_service),
     db: Session = Depends(get_db),
+    _: dict = Depends(require_roles("owner", "admin")),
 ):
     data = service.delete(db, appointment_id)
 
@@ -152,6 +153,7 @@ def pay(
     data_in: PayPrice,
     service: AppointmentService = Depends(get_appointment_service),
     db: Session = Depends(get_db),
+    _: dict = Depends(require_roles("owner")),
 ):
     data = service.pay(db, data_in)
     return ResponseSchema(data=data, message=messages.SUCCESS)

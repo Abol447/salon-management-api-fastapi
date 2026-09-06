@@ -8,8 +8,13 @@ from app.services.role_service import RoleService
 from app.db.database import get_db
 from app.core.messages import messages
 from app.schemas.response import ResponseSchema
+from app.dependencies.auth import require_roles
 
-router = APIRouter(prefix="/roles", tags=["roles"])
+router = APIRouter(
+    prefix="/roles",
+    tags=["roles"],
+    dependencies=[Depends(require_roles("admin"))],
+)
 
 
 def get_service() -> RoleService:

@@ -20,6 +20,19 @@ class DiscountCreate(BaseModel):
     is_active: bool = True
 
 
+class DiscountResponse(BaseModel):
+    id: int
+    title: str
+    percent: Decimal
+    start_date: datetime
+    end_date: datetime
+    customer_id: int
+    max_usage: int
+    is_active: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class MyDiscount(BaseModel):
     discount: DiscountResponse
     discount_usage: int
@@ -39,16 +52,3 @@ class DiscountUpdate(BaseModel):
     max_usage: int | None = Field(default=None, ge=1)
 
     is_active: bool | None = None
-
-
-class DiscountResponse(BaseModel):
-    id: int
-    title: str
-    percent: Decimal
-    start_date: datetime
-    end_date: datetime
-    customer_id: int
-    max_usage: int
-    is_active: bool
-
-    model_config = ConfigDict(from_attributes=True)

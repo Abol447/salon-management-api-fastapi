@@ -39,7 +39,6 @@ class AppointmentCreateInternal(BaseModel):
 class AppointmentUpdate(BaseModel):
     start_time: datetime | None = None
     description: str | None = None
-    paid_price: Decimal | None = None
 
 
 class AppointmentServicesUpdate(BaseModel):

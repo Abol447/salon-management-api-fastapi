@@ -27,7 +27,9 @@ class WalletTransactionService:
 
     def __init__(
         self,
-        repo: CRUDBase[WalletTransaction, WalletTransactionCreate],
+        repo: CRUDBase[
+            WalletTransaction, WalletTransactionCreate, WalletTransactionUpdate
+        ],
         wallet_repo: CRUDBase[Wallet, WalletCreate, WalletUpdate],
         customer_repo: CRUDBase[Customer, CustomerCreate, CustomerUpdate],
     ):
@@ -35,7 +37,9 @@ class WalletTransactionService:
         self.wallet_repo = wallet_repo
         self.customer_repo = customer_repo
 
-    def create(self, db: Session, data_in: WalletTransactionCreate  , auto_commit : bool = True):
+    def create(
+        self, db: Session, data_in: WalletTransactionCreate, auto_commit: bool = True
+    ):
         try:
             wallet = self.wallet_repo.get_by_id(db, data_in.wallet_id)
 
@@ -43,8 +47,6 @@ class WalletTransactionService:
                 raise BadRequestException("کیف پول یافت نشد ")
 
             balance, amount = wallet_balance(wallet, data_in.type, data_in.amount)
-
-        
 
             self.wallet_repo.update(
                 db, wallet, WalletUpdate(balance=balance), auto_commit=False
@@ -54,10 +56,10 @@ class WalletTransactionService:
 
             transaction = self.repo.create(db, data_in, auto_commit=False)
 
-            if auto_commit :
+            if auto_commit:
                 db.commit()
                 db.refresh(transaction)
-            else :
+            else:
                 db.flush()
 
             return transaction
