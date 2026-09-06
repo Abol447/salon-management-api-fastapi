@@ -1,45 +1,71 @@
 from logging.config import fileConfig
+
 import os
 from pathlib import Path
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
 from dotenv import load_dotenv
+from sqlalchemy import engine_from_config, pool
 
 from app.models import *
 from app.db.base import Base
 
-# Load .env from project root
+# ============================================================
+# Load .env
+# ============================================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_FILE = BASE_DIR / ".env"
 
-load_dotenv(ENV_FILE)
+load_dotenv(ENV_FILE, override=True)
+
+
+# ============================================================
+# Alembic Config
+# ============================================================
 
 config = context.config
+
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+
+# ============================================================
+# SQLAlchemy Metadata
+# ============================================================
+
 target_metadata = Base.metadata
+
+
+# ============================================================
+# Database URL
+# ============================================================
 
 
 def get_database_url() -> str:
     host = os.getenv("DATABASE_HOST")
     port = os.getenv("DATABASE_PORT")
     user = os.getenv("DATABASE_USER")
-    password = os.getenv("DATABASE_PASSWORD")
+    password = os.getenv("DATABASE_PASSWORD", "")
     database = os.getenv("DATABASE_NAME")
 
-    if not all([host, port, user, password, database]):
+    # Password can be empty for local MySQL
+    if not all([host, port, user, database]):
         raise RuntimeError(
-            f"Database configuration is incomplete. "
-            f"HOST={host}, PORT={port}, USER={user}, "
+            "Database configuration is incomplete. "
+            f"HOST={host}, "
+            f"PORT={port}, "
+            f"USER={user}, "
             f"DATABASE={database}"
         )
 
     return f"mysql+pymysql://" f"{user}:{password}@{host}:{port}/{database}"
+
+
+# ============================================================
+# Offline Migration
+# ============================================================
 
 
 def run_migrations_offline() -> None:
@@ -54,6 +80,11 @@ def run_migrations_offline() -> None:
 
     with context.begin_transaction():
         context.run_migrations()
+
+
+# ============================================================
+# Online Migration
+# ============================================================
 
 
 def run_migrations_online() -> None:
@@ -81,6 +112,10 @@ def run_migrations_online() -> None:
         with context.begin_transaction():
             context.run_migrations()
 
+
+# ============================================================
+# Run
+# ============================================================
 
 if context.is_offline_mode():
     run_migrations_offline()
